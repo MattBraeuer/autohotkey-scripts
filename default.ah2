@@ -97,7 +97,7 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
     if (maximiseWindow) {
         ; Wait for the window to be active
         if !hwnd {
-            hwnd := WinWaitActive(winCriteria, "", 5)
+            hwnd := WinWaitActive(winCriteria, "", 10)
         }
 
         try {
