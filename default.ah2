@@ -26,7 +26,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
     '"C:\Users\MattB\AppData\Local\Programs\Microsoft VS Code\Code.exe"', true)
 ^!t:: switchToWindow("", "WindowsTerminal.exe", '"C:\Users\MattB\AppData\Local\Microsoft\WindowsApps\wt.exe"')
 ^!s:: switchToWindow("Slack", "slack.exe", '"C:\Users\MattB\AppData\Local\Microsoft\WindowsApps\Slack.exe"', true)
-^!m:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe",
+^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe",
     "C:\Users\MattB\AppData\Local\Microsoft\WindowsApps\motion---projects,-tasks,-and-calendar.exe",
     true)
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
@@ -41,6 +41,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^!j:: switchToWindow("JIRA", "msedge.exe",
     '"C:\Program Files (x86)\Microsoft\Edge\Application\msedge_proxy.exe" --profile-directory="Default" --app-id=ejpflhkiicffhpomkffalllpffbaggio --app-url=https://faircg.atlassian.net/jira --app-title="JIRA"'
 )
+^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
 
 ; Window management hotkeys
 #!Down:: WinMinimize("A") ; Minimise the active window
