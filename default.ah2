@@ -17,29 +17,32 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ; ----- IMPORT OF OTHER SCRIPTS -----
 #Include %A_LineFile%\..\..\VD.ahk\VD.ah2    ; Virtual Desktop library
 
+; ----- CONSTANT DEFINITIONS -----
+USER_PROFILE := EnvGet("USERPROFILE")
+MSEDGE_PROXY_PATH := "C:\Program Files (x86)\Microsoft\Edge\Application\msedge_proxy.exe"
+WINDOWS_APPS_PATH := USER_PROFILE "\AppData\Local\Microsoft\WindowsApps\"
+LOCAL_PROGRAMS_PATH := USER_PROFILE "\AppData\Local\Programs\"
+
 ; ----- HOTKEY DEFINITIONS -----
 
 ; Switch to application windows or launch them if not found
 ^!w:: switchToWindow("FAIR - Microsoft​ Edge", "msedge.exe", 'msedge.exe --profile-directory="Default"', true)
 ^!e:: switchToWindow("Personal", "msedge.exe", 'msedge.exe --profile-directory="Profile 1"', true)
-^!v:: switchToWindow("Visual Studio Code", "Code.exe",
-    '"C:\Users\MattB\AppData\Local\Programs\Microsoft VS Code\Code.exe"', true)
-^!t:: switchToWindow("", "WindowsTerminal.exe", '"C:\Users\MattB\AppData\Local\Microsoft\WindowsApps\wt.exe"')
-^!s:: switchToWindow("Slack", "slack.exe", '"C:\Users\MattB\AppData\Local\Microsoft\WindowsApps\Slack.exe"', true)
-^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe",
-    "C:\Users\MattB\AppData\Local\Microsoft\WindowsApps\motion---projects,-tasks,-and-calendar.exe",
-    true)
+^!v:: switchToWindow("Visual Studio Code", "Code.exe", LOCAL_PROGRAMS_PATH "Microsoft VS Code\Code.exe", true)
+^!t:: switchToWindow("", "WindowsTerminal.exe", WINDOWS_APPS_PATH "wt.exe")
+^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe", true)
+^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe", true)
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
-    '"C:\Program Files (x86)\Microsoft\Edge\Application\msedge_proxy.exe" --profile-directory="Default" --app-id=fmgjjmmmlfnkbppncabfkddbjimcfncm --app-url=https://mail.google.com/mail/?usp=installed_webapp --app-title="Gmail" --app-launch-source=4',
+    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=fmgjjmmmlfnkbppncabfkddbjimcfncm --app-url=https://mail.google.com/mail/?usp=installed_webapp --app-title="Gmail" --app-launch-source=4',
     true)
 ^!c:: switchToWindow("Google Calendar", "msedge.exe",
-    '"C:\Program Files (x86)\Microsoft\Edge\Application\msedge_proxy.exe" --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4',
+    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4',
     true)
 ^!k:: switchToWindow("Kagi Assistant", "msedge.exe",
-    '"C:\Program Files (x86)\Microsoft\Edge\Application\msedge_proxy.exe" --profile-directory="Profile 1" --app-id=oafeghdgfnbkcilmbhphalhjimlhkcdc --app-url=https://kagi.com/assistant --app-title="Kagi Assistant"'
+    MSEDGE_PROXY_PATH ' --profile-directory="Profile 1" --app-id=oafeghdgfnbkcilmbhphalhjimlhkcdc --app-url=https://kagi.com/assistant --app-title="Kagi Assistant"'
 )
 ^!j:: switchToWindow("JIRA", "msedge.exe",
-    '"C:\Program Files (x86)\Microsoft\Edge\Application\msedge_proxy.exe" --profile-directory="Default" --app-id=ejpflhkiicffhpomkffalllpffbaggio --app-url=https://faircg.atlassian.net/jira --app-title="JIRA"'
+    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=ejpflhkiicffhpomkffalllpffbaggio --app-url=https://faircg.atlassian.net/jira --app-title="JIRA"'
 )
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
 
