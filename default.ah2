@@ -142,7 +142,7 @@ showToast(msg, duration := 1000, width := 150, height := 20) {
 
     ; center on screen
     x := (A_ScreenWidth - 300) / 2
-    y := (A_ScreenHeight - 150) ; 100 pixels from the top
+    y := (A_ScreenHeight - 150)
 
     toastGui.Show("NoActivate x" x " y" y)
     SetTimer(() => toastGui.Destroy(), duration)
