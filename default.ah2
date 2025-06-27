@@ -61,9 +61,10 @@ LOCAL_PROGRAMS_PATH := USER_PROFILE "\AppData\Local\Programs\"
 ^#NumpadDot:: showToast(getDesktopName()) ; Show current desktop name
 
 ; Move window to desktop
-#numpad1:: VD.MoveWindowToDesktopNum("A", 2)
-#numpad2:: VD.MoveWindowToDesktopNum("A", 3)
-#numpad3:: VD.MoveWindowToDesktopNum("A", 4)
+#numpad0:: VD.MoveWindowToDesktopNum("A", 1) ; Move active window to Terminal desktop
+#numpad1:: VD.MoveWindowToDesktopNum("A", 2) ; Move active window to Primary desktop
+#numpad2:: VD.MoveWindowToDesktopNum("A", 3) ; Move active window to Secondary desktop
+#numpad3:: VD.MoveWindowToDesktopNum("A", 4) ; Move active window to Video Conference desktop
 
 ; ----- FUNCTION DEFINITIONS -----
 
