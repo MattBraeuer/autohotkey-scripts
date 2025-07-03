@@ -64,6 +64,7 @@ APP_DESKTOP_MAP := Map(
 
 ; Window management hotkeys
 #!Down:: WinMinimize("A") ; Minimise the active window
+#!Up:: WinMaximize("A") ; Maximise the active window
 
 ; Virtual Desktop hotkeys (the ones with Right-ALT are for binding to Razer Keyboard special keys)
 ^#numpad0:: VD.goToDesktopNum(1)  ;Terminal
