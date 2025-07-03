@@ -113,10 +113,6 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
         if (currentDesktop != targetDesktop) {
             VD.goToDesktopNum(targetDesktop)
         }
-        
-        ; Show toast notification
-        desktopName := getDesktopName()
-        showToast("Opening " . appName . " on " . desktopName . " desktop", 2000, 350)
     }
     
     Run(launchCommand)
