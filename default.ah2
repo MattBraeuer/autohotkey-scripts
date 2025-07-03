@@ -23,6 +23,21 @@ MSEDGE_PROXY_PATH := "C:\Program Files (x86)\Microsoft\Edge\Application\msedge_p
 WINDOWS_APPS_PATH := USER_PROFILE "\AppData\Local\Microsoft\WindowsApps\"
 LOCAL_PROGRAMS_PATH := USER_PROFILE "\AppData\Local\Programs\"
 
+; Application to desktop mapping configuration
+APP_DESKTOP_MAP := Map(
+    "Code.exe|Visual Studio Code", [2, "VS Code"],                    ; VS Code -> Primary Desktop
+    "WindowsTerminal.exe|", [1, "Windows Terminal"],                   ; Windows Terminal -> Terminal Desktop
+    "msedge.exe|FAIR - Microsoft​ Edge", [2, "Microsoft Edge (Work)"], ; Work Edge -> Primary Desktop
+    "msedge.exe|Personal", [2, "Microsoft Edge (Personal)"],          ; Personal Edge -> Primary Desktop
+    "msedge.exe|Google Calendar", [3, "Google Calendar"],             ; Google Calendar -> Secondary Desktop
+    "msedge.exe|FAIR Consulting Group Mail", [3, "Gmail"],            ; Gmail -> Secondary Desktop
+    "msedge.exe|Kagi Assistant", [2, "Kagi Assistant"],               ; Kagi Assistant -> Primary Desktop
+    "msedge.exe|JIRA", [3, "JIRA"],                                   ; JIRA -> Secondary Desktop
+    "slack.exe|Slack", [3, "Slack"],                                  ; Slack -> Secondary Desktop
+    "Motion - Projects, Tasks, and Calendar.exe|Motion", [3, "Motion"], ; Motion -> Secondary Desktop
+    "Mailbird.exe|Mailbird", [3, "Mailbird"]                         ; Mailbird -> Secondary Desktop
+)
+
 ; ----- HOTKEY DEFINITIONS -----
 
 ; Switch to application windows or launch them if not found
@@ -70,7 +85,34 @@ LOCAL_PROGRAMS_PATH := USER_PROFILE "\AppData\Local\Programs\"
 ; ----- FUNCTION DEFINITIONS -----
 
 ; Function to launch an application and optionally maximize its window
-launchApplication(launchCommand, winCriteria, maximiseWindow := false) {
+launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName := "", winTitle := "") {
+    ; Determine target desktop for the application
+    targetDesktop := 0
+    appName := ""
+    
+    if (exeName) {
+        ; Create compound key with exe name and window title
+        compoundKey := exeName . "|" . winTitle
+        
+        if (APP_DESKTOP_MAP.Has(compoundKey)) {
+            config := APP_DESKTOP_MAP[compoundKey]
+            targetDesktop := config[1]
+            appName := config[2]
+        }
+    }
+    
+    ; Switch to target desktop if configured
+    if (targetDesktop > 0) {
+        currentDesktop := VD.getCurrentDesktopNum()
+        if (currentDesktop != targetDesktop) {
+            VD.goToDesktopNum(targetDesktop)
+        }
+        
+        ; Show toast notification
+        desktopName := getDesktopName()
+        showToast("Opening " . appName . " on " . desktopName . " desktop", 2000, 350)
+    }
+    
     Run(launchCommand)
 
     if (maximiseWindow) {
@@ -112,7 +154,7 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
             WinActivate(winCriteria)
         } else {
             ; If the window is not found, launch the application
-            launchApplication(launchCommand, winCriteria, maximiseWindow)
+            launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
             return
         }
     }
