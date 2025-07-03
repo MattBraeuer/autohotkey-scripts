@@ -31,7 +31,8 @@ LOCAL_PROGRAMS_PATH := USER_PROFILE "\AppData\Local\Programs\"
 ^!v:: switchToWindow("Visual Studio Code", "Code.exe", LOCAL_PROGRAMS_PATH "Microsoft VS Code\Code.exe", true)
 ^!t:: switchToWindow("", "WindowsTerminal.exe", WINDOWS_APPS_PATH "wt.exe")
 ^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe", true)
-^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe", true)
+^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe",
+    true)
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
     MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=fmgjjmmmlfnkbppncabfkddbjimcfncm --app-url=https://mail.google.com/mail/?usp=installed_webapp --app-title="Gmail" --app-launch-source=4',
     true)
@@ -68,6 +69,22 @@ LOCAL_PROGRAMS_PATH := USER_PROFILE "\AppData\Local\Programs\"
 
 ; ----- FUNCTION DEFINITIONS -----
 
+; Function to launch an application and optionally maximize its window
+launchApplication(launchCommand, winCriteria, maximiseWindow := false) {
+    Run(launchCommand)
+
+    if (maximiseWindow) {
+        ; Wait for the window to be active
+        hwnd := WinWaitActive(winCriteria, "", 10)
+
+        try {
+            WinMaximize(hwnd)
+        } catch Error as e {
+            showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
+        }
+    }
+}
+
 ; Function to switch to a window or launch an application if not found
 switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := false) {
     winCriteria := winTitleSubstring " ahk_exe " exeName
@@ -95,16 +112,12 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
             WinActivate(winCriteria)
         } else {
             ; If the window is not found, launch the application
-            Run(launchCommand)
+            launchApplication(launchCommand, winCriteria, maximiseWindow)
+            return
         }
     }
 
-    if (maximiseWindow) {
-        ; Wait for the window to be active
-        if !hwnd {
-            hwnd := WinWaitActive(winCriteria, "", 10)
-        }
-
+    if (maximiseWindow && hwnd) {
         try {
             WinMaximize(hwnd)
         } catch Error as e {
