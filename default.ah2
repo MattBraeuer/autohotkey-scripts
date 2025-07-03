@@ -68,13 +68,18 @@ APP_DESKTOP_MAP := Map(
 ; Virtual Desktop hotkeys (the ones with Right-ALT are for binding to Razer Keyboard special keys)
 ^#numpad0:: VD.goToDesktopNum(1)  ;Terminal
 ^>!numpad0:: VD.goToDesktopNum(1)  ;Terminal (Right Alt)
+^#0:: VD.goToDesktopNum(1)  ;Terminal (standard number key)
 ^#numpad1:: VD.goToDesktopNum(2)  ;Primary Desktop
 ^>!numpad1:: VD.goToDesktopNum(2)  ;Primary Desktop (Right Alt)
+^#1:: VD.goToDesktopNum(2)  ;Primary Desktop (standard number key)
 ^#numpad2:: VD.goToDesktopNum(3)  ;Secondary Desktop
 ^>!numpad2:: VD.goToDesktopNum(3)  ;Secondary Desktop (Right Alt)
+^#2:: VD.goToDesktopNum(3)  ;Secondary Desktop (standard number key)
 ^#numpad3:: VD.goToDesktopNum(4)  ;Video Conference Desktop
 ^>!numpad3:: VD.goToDesktopNum(4)  ;Video Conference Desktop (Right Alt)
+^#3:: VD.goToDesktopNum(4)  ;Video Conference Desktop (standard number key)
 ^#NumpadDot:: showToast(getDesktopName()) ; Show current desktop name
+^#.:: showToast(getDesktopName()) ; Show current desktop name (standard period key)
 
 ; Move window to desktop
 #numpad0:: VD.MoveWindowToDesktopNum("A", 1) ; Move active window to Terminal desktop
