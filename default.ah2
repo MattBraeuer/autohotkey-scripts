@@ -35,7 +35,8 @@ APP_DESKTOP_MAP := Map(
     "msedge.exe|JIRA", [3, "JIRA"],                                   ; JIRA -> Secondary Desktop
     "slack.exe|Slack", [3, "Slack"],                                  ; Slack -> Secondary Desktop
     "Motion - Projects, Tasks, and Calendar.exe|Motion", [3, "Motion"], ; Motion -> Secondary Desktop
-    "Mailbird.exe|Mailbird", [3, "Mailbird"]                         ; Mailbird -> Secondary Desktop
+    "Mailbird.exe|Mailbird", [3, "Mailbird"],                         ; Mailbird -> Secondary Desktop
+    "Obsidian.exe|", [3, "Obsidian"]                                  ; Obsidian -> Secondary Desktop
 )
 
 ; ----- HOTKEY DEFINITIONS -----
@@ -61,6 +62,7 @@ APP_DESKTOP_MAP := Map(
     MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=ejpflhkiicffhpomkffalllpffbaggio --app-url=https://faircg.atlassian.net/jira --app-title="JIRA"'
 )
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
+^!o:: switchToWindow("", "Obsidian.exe", LOCAL_PROGRAMS_PATH "Obsidian\Obsidian.exe", true)
 
 ; Window management hotkeys
 #!Down:: WinMinimize("A") ; Minimise the active window
