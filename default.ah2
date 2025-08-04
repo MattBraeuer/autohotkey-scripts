@@ -131,6 +131,19 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
     }
 }
 
+; Function to minimize all windows and reactivate the specified window
+minimizeAllAndActivate(hwnd) {
+    Send("#m")
+    Sleep(100) ; Brief pause to ensure minimize completes
+    try {
+        WinActivate(hwnd)
+    } catch Error as e {
+        showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
+        return false
+    }
+    return true
+}
+
 ; Function to switch to a window or launch an application if not found
 switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := false) {
     winCriteria := winTitleSubstring " ahk_exe " exeName
@@ -139,14 +152,12 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
     hwnd := WinExist(winCriteria)
 
     if hwnd && WinActive(hwnd) {
-        ; If the window is already active, do nothing
+        ; If the window is already active, minimize all other windows for clean desktop
+        minimizeAllAndActivate(hwnd)
         return
     } else if hwnd {
-        ; If the window exists but is not active, activate it
-        try {
-            WinActivate(hwnd)
-        } catch Error as e {
-            showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
+        ; If the window exists but is not active, minimize all and activate it
+        if (!minimizeAllAndActivate(hwnd)) {
             return
         }
     } else {
@@ -156,11 +167,16 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
         if desktopOfWindow != -1 {
             ; If the window is on another desktop, switch to that desktop
             VD.goToDesktopNum(desktopOfWindow)
-            try {
-                WinActivate(winCriteria)
-            } catch Error as e {
-                ; Unable to activate window, possibly closed
-                showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
+            
+            ; Re-check if window exists after desktop switch
+            hwnd := WinExist(winCriteria)
+            if (hwnd) {
+                if (!minimizeAllAndActivate(hwnd)) {
+                    return
+                }
+            } else {
+                ; Window not found after desktop switch, launch it
+                launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
                 return
             }
         } else {
