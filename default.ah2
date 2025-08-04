@@ -97,18 +97,18 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
     ; Determine target desktop for the application
     targetDesktop := 0
     appName := ""
-    
+
     if (exeName) {
         ; Create compound key with exe name and window title
         compoundKey := exeName . "|" . winTitle
-        
+
         if (APP_DESKTOP_MAP.Has(compoundKey)) {
             config := APP_DESKTOP_MAP[compoundKey]
             targetDesktop := config[1]
             appName := config[2]
         }
     }
-    
+
     ; Switch to target desktop if configured
     if (targetDesktop > 0) {
         currentDesktop := VD.getCurrentDesktopNum()
@@ -116,7 +116,7 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
             VD.goToDesktopNum(targetDesktop)
         }
     }
-    
+
     Run(launchCommand)
 
     if (maximiseWindow) {
@@ -147,6 +147,7 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
             WinActivate(hwnd)
         } catch Error as e {
             showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
+            return
         }
     } else {
         ; If the window is not found, check other desktops
@@ -155,7 +156,13 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
         if desktopOfWindow != -1 {
             ; If the window is on another desktop, switch to that desktop
             VD.goToDesktopNum(desktopOfWindow)
-            WinActivate(winCriteria)
+            try {
+                WinActivate(winCriteria)
+            } catch Error as e {
+                ; Unable to activate window, possibly closed
+                showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
+                return
+            }
         } else {
             ; If the window is not found, launch the application
             launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
