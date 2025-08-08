@@ -167,6 +167,11 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
             ; If the window is on another desktop, switch to that desktop
             VD.goToDesktopNum(desktopOfWindow)
             
+            ; Wait for desktop change to complete
+            while (VD.getCurrentDesktopNum() != desktopOfWindow) {
+                Sleep(10)
+            }
+            
             ; Re-check if window exists after desktop switch
             hwnd := WinExist(winCriteria)
             if (hwnd) {
