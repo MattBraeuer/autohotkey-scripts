@@ -36,7 +36,8 @@ APP_DESKTOP_MAP := Map(
     "slack.exe|Slack", [3, "Slack"],                                  ; Slack -> Secondary Desktop
     "Motion - Projects, Tasks, and Calendar.exe|Motion", [3, "Motion"], ; Motion -> Secondary Desktop
     "Mailbird.exe|Mailbird", [3, "Mailbird"],                         ; Mailbird -> Secondary Desktop
-    "Obsidian.exe|", [3, "Obsidian"]                                  ; Obsidian -> Secondary Desktop
+    "Obsidian.exe|", [3, "Obsidian"],                                 ; Obsidian -> Secondary Desktop
+    "Miro.exe|", [2, "Miro"]                                          ; Miro -> Primary Desktop
 )
 
 ; ----- HOTKEY DEFINITIONS -----
@@ -62,6 +63,7 @@ APP_DESKTOP_MAP := Map(
 )
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
 ^!o:: switchToWindow("", "Obsidian.exe", LOCAL_PROGRAMS_PATH "Obsidian\Obsidian.exe", true)
+^!m:: switchToWindow("", "Miro.exe", WINDOWS_APPS_PATH "Miro.exe", true)
 
 ; Window management hotkeys
 #!Down:: WinMinimize("A") ; Minimise the active window
