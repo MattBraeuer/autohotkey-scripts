@@ -68,8 +68,8 @@ APP_DESKTOP_MAP := Map(
 ^!m:: switchToWindow("", "Miro.exe", WINDOWS_APPS_PATH "Miro.exe", true)
 
 ; Window management hotkeys
-#!Down:: WinMinimize("A") ; Minimise the active window
-#!Up:: WinMaximize("A") ; Maximise the active window
+#!Down:: minimizeActiveWindow()
+#!Up:: maximizeActiveWindow()
 
 ; Virtual Desktop hotkeys (the ones with Right-ALT are for binding to Razer Keyboard special keys)
 ^#numpad0:: VD.goToDesktopNum(1)  ;Terminal
@@ -94,6 +94,34 @@ APP_DESKTOP_MAP := Map(
 #numpad3:: VD.MoveWindowToDesktopNum("A", 4) ; Move active window to Video Conference desktop
 
 ; ----- FUNCTION DEFINITIONS -----
+
+; Function to minimize the active window with error handling
+minimizeActiveWindow() {
+    try {
+        hwnd := WinGetID("A")
+        if (hwnd) {
+            WinMinimize(hwnd)
+        } else {
+            showToast("No active window to minimize", 1000)
+        }
+    } catch Error as e {
+        showToast("Failed to minimize window: " . e.Message, 2000)
+    }
+}
+
+; Function to maximize the active window with error handling
+maximizeActiveWindow() {
+    try {
+        hwnd := WinGetID("A")
+        if (hwnd) {
+            WinMaximize(hwnd)
+        } else {
+            showToast("No active window to maximize", 1000)
+        }
+    } catch Error as e {
+        showToast("Failed to maximize window: " . e.Message, 2000)
+    }
+}
 
 ; Function to launch an application and optionally maximize its window
 launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName := "", winTitle := "") {
