@@ -48,7 +48,8 @@ APP_DESKTOP_MAP := Map(
 ^!v:: switchToWindow("Visual Studio Code", "Code.exe", LOCAL_PROGRAMS_PATH "Microsoft VS Code\Code.exe", true)
 ^!t:: switchToWindow("", "WindowsTerminal.exe", WINDOWS_APPS_PATH "wt.exe")
 ^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe", true)
-^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe")
+^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe"
+)
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
     MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=fmgjjmmmlfnkbppncabfkddbjimcfncm --app-url=https://mail.google.com/mail/?usp=installed_webapp --app-title="Gmail" --app-launch-source=4',
     true)
@@ -59,7 +60,8 @@ APP_DESKTOP_MAP := Map(
     MSEDGE_PROXY_PATH ' --profile-directory="Profile 1" --app-id=oafeghdgfnbkcilmbhphalhjimlhkcdc --app-url=https://kagi.com/assistant --app-title="Kagi Assistant"'
 )
 ^!j:: switchToWindow("JIRA", "msedge.exe",
-    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=ejpflhkiicffhpomkffalllpffbaggio --app-url=https://faircg.atlassian.net/jira --app-title="JIRA"'
+    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=ejpflhkiicffhpomkffalllpffbaggio --app-url=https://faircg.atlassian.net/jira --app-title="JIRA"',
+    true
 )
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
 ^!o:: switchToWindow("", "Obsidian.exe", LOCAL_PROGRAMS_PATH "Obsidian\Obsidian.exe", true)
@@ -132,12 +134,20 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
     }
 }
 
-; Function to minimize all windows and reactivate the specified window
-minimizeAllAndActivate(hwnd) {
-    Send("#m")
-    Sleep(100) ; Brief pause to ensure minimize completes
+; Function to activate a window and optionally maximize it
+activateWindow(hwnd, maximiseWindow := false) {
+    if (!maximiseWindow) {
+        ; Minimize all windows first when NOT maximizing to show desktop background
+        Send("#m")
+        Sleep(100) ; Brief pause to ensure minimize completes
+    }
+
     try {
         WinActivate(hwnd)
+
+        if (maximiseWindow) {
+            WinMaximize(hwnd)
+        }
     } catch Error as e {
         showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
         return false
@@ -153,12 +163,12 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
     hwnd := WinExist(winCriteria)
 
     if hwnd && WinActive(hwnd) {
-        ; If the window is already active, minimize all other windows for clean desktop
-        minimizeAllAndActivate(hwnd)
+        ; If the window is already active, minimize all other windows for clean desktop if maximizing
+        activateWindow(hwnd, maximiseWindow)
         return
     } else if hwnd {
-        ; If the window exists but is not active, minimize all and activate it
-        if (!minimizeAllAndActivate(hwnd)) {
+        ; If the window exists but is not active, activate it and optionally maximize
+        if (!activateWindow(hwnd, maximiseWindow)) {
             return
         }
     } else {
@@ -168,16 +178,16 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
         if desktopOfWindow != -1 {
             ; If the window is on another desktop, switch to that desktop
             VD.goToDesktopNum(desktopOfWindow)
-            
+
             ; Wait for desktop change to complete
             while (VD.getCurrentDesktopNum() != desktopOfWindow) {
                 Sleep(10)
             }
-            
+
             ; Re-check if window exists after desktop switch
             hwnd := WinExist(winCriteria)
             if (hwnd) {
-                if (!minimizeAllAndActivate(hwnd)) {
+                if (!activateWindow(hwnd, maximiseWindow)) {
                     return
                 }
             } else {
