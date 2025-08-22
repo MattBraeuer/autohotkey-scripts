@@ -162,6 +162,11 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
     }
 }
 
+; Function to release all modifier keys
+releaseModifierKeys() {
+    Send("{Ctrl up}{Alt up}{Shift up}{LWin up}{RWin up}")
+}
+
 ; Function to activate a window and optionally maximize it
 activateWindow(hwnd, maximiseWindow := false) {
     if (!maximiseWindow) {
@@ -176,8 +181,13 @@ activateWindow(hwnd, maximiseWindow := false) {
         if (maximiseWindow) {
             WinMaximize(hwnd)
         }
+        
+        ; Release modifier keys to prevent them from getting stuck
+        releaseModifierKeys()
+        
     } catch Error as e {
         showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
+        releaseModifierKeys() ; Release keys even on error
         return false
     }
     return true
@@ -185,6 +195,9 @@ activateWindow(hwnd, maximiseWindow := false) {
 
 ; Function to switch to a window or launch an application if not found
 switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := false) {
+    ; Release modifier keys at the start to ensure clean state
+    releaseModifierKeys()
+    
     winCriteria := winTitleSubstring " ahk_exe " exeName
 
     ; Check current desktop
@@ -221,22 +234,19 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
             } else {
                 ; Window not found after desktop switch, launch it
                 launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
+                releaseModifierKeys()
                 return
             }
         } else {
             ; If the window is not found, launch the application
             launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
+            releaseModifierKeys()
             return
         }
     }
-
-    if (maximiseWindow && hwnd) {
-        try {
-            WinMaximize(hwnd)
-        } catch Error as e {
-            showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
-        }
-    }
+    
+    ; Final modifier key release
+    releaseModifierKeys()
 }
 
 ; Function to get the name of the current virtual desktop
