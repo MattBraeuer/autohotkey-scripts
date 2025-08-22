@@ -95,6 +95,118 @@ APP_DESKTOP_MAP := Map(
 
 ; ----- FUNCTION DEFINITIONS -----
 
+; Function to get all windows matching criteria
+getAllMatchingWindows(winCriteria) {
+    windows := []
+    
+    ; Save current settings
+    bak_DetectHiddenWindows := A_DetectHiddenWindows
+    bak_TitleMatchMode := A_TitleMatchMode
+    
+    try {
+        ; Enable detection of hidden windows (windows on other desktops)
+        DetectHiddenWindows true
+        SetTitleMatchMode "2"
+        
+        ; Get all windows matching the criteria across all desktops
+        windowList := WinGetList(winCriteria)
+        
+        for hwnd in windowList {
+            ; Verify the window still exists and is valid
+            if (WinExist("ahk_id " . hwnd)) {
+                windows.Push(hwnd)
+            }
+        }
+    } catch Error as e {
+        ; Fallback: check only current desktop if WinGetList fails
+        try {
+            hwnd := WinExist(winCriteria)
+            if (hwnd) {
+                windows.Push(hwnd)
+            }
+        }
+    } finally {
+        ; Restore original settings
+        SetTitleMatchMode bak_TitleMatchMode
+        DetectHiddenWindows bak_DetectHiddenWindows
+    }
+    
+    return windows
+}
+
+; Function to switch to the desktop containing the specified window
+switchToWindowDesktop(hwnd) {
+    desktopOfWindow := VD.getDesktopNumOfWindow("ahk_id " . hwnd)
+    currentDesktop := VD.getCurrentDesktopNum()
+    
+    ; Switch to the target desktop if needed
+    if (desktopOfWindow != -1 && desktopOfWindow != currentDesktop) {
+        VD.goToDesktopNum(desktopOfWindow)
+        ; Wait for desktop change to complete with timeout
+        timeout := A_TickCount + 2000 ; 2 second timeout
+        while (VD.getCurrentDesktopNum() != desktopOfWindow && A_TickCount < timeout) {
+            Sleep(10)
+        }
+        ; Additional delay to ensure desktop switch is fully complete
+        Sleep(100)
+        return (VD.getCurrentDesktopNum() == desktopOfWindow)
+    }
+    return true
+}
+
+; Function to cycle through windows matching criteria
+cycleMatchingWindows(winCriteria, maximiseWindow := false) {
+    ; Static variable to track window cycling state
+    static windowCycleState := Map()
+    
+    windows := getAllMatchingWindows(winCriteria)
+    
+    if (windows.Length == 0) {
+        return false ; No windows found
+    }
+    
+    ; Only one window - switch to its desktop first
+    if (windows.Length == 1) {
+        targetWindow := windows[1]
+        if (!switchToWindowDesktop(targetWindow)) {
+            return false ; Desktop switch failed
+        }
+        return activateWindow(targetWindow, maximiseWindow)
+    }
+    
+    ; Multiple windows - cycle through them
+    currentTime := A_TickCount
+    cycleKey := winCriteria
+    
+    ; Initialize or get cycle state for this criteria
+    if (!windowCycleState.Has(cycleKey)) {
+        windowCycleState[cycleKey] := {index: 0, lastTime: 0, windows: []}
+    }
+    
+    cycleData := windowCycleState[cycleKey]
+    
+    ; Reset cycle if it's been more than 3 seconds since last activation
+    ; or if the window list has changed
+    if (currentTime - cycleData.lastTime > 3000 || 
+        cycleData.windows.Length != windows.Length) {
+        cycleData.index := 0
+        cycleData.windows := windows.Clone()
+    } else {
+        ; Move to next window in cycle
+        cycleData.index := Mod(cycleData.index + 1, windows.Length)
+    }
+    
+    ; Update last activation time
+    cycleData.lastTime := currentTime
+    
+    ; Activate target window
+    targetWindow := windows[cycleData.index + 1] ; Arrays are 1-based
+    if (!switchToWindowDesktop(targetWindow)) {
+        return false ; Desktop switch failed
+    }
+    return activateWindow(targetWindow, maximiseWindow)
+}
+
 ; Function to minimize the active window with error handling
 minimizeActiveWindow() {
     try {
@@ -169,6 +281,11 @@ releaseModifierKeys() {
 
 ; Function to activate a window and optionally maximize it
 activateWindow(hwnd, maximiseWindow := false) {
+    ; Verify the window still exists before attempting to activate
+    if (!WinExist("ahk_id " . hwnd)) {
+        return false
+    }
+    
     if (!maximiseWindow) {
         ; Minimize all windows first when NOT maximizing to show desktop background
         Send("#m")
@@ -176,10 +293,22 @@ activateWindow(hwnd, maximiseWindow := false) {
     }
 
     try {
-        WinActivate(hwnd)
+        ; Try to activate the window with a timeout
+        WinActivate("ahk_id " . hwnd)
+        
+        ; Wait for activation with timeout
+        timeout := A_TickCount + 1000 ; 1 second timeout
+        while (!WinActive("ahk_id " . hwnd) && A_TickCount < timeout) {
+            Sleep(10)
+        }
+        
+        ; Check if activation was successful
+        if (!WinActive("ahk_id " . hwnd)) {
+            return false
+        }
 
         if (maximiseWindow) {
-            WinMaximize(hwnd)
+            WinMaximize("ahk_id " . hwnd)
         }
         
         ; Release modifier keys to prevent them from getting stuck
@@ -200,52 +329,14 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
     
     winCriteria := winTitleSubstring " ahk_exe " exeName
 
-    ; Check current desktop
-    hwnd := WinExist(winCriteria)
-
-    if hwnd && WinActive(hwnd) {
-        ; If the window is already active, minimize all other windows for clean desktop if maximizing
-        activateWindow(hwnd, maximiseWindow)
+    ; Try to cycle through matching windows first
+    if (cycleMatchingWindows(winCriteria, maximiseWindow)) {
+        releaseModifierKeys()
         return
-    } else if hwnd {
-        ; If the window exists but is not active, activate it and optionally maximize
-        if (!activateWindow(hwnd, maximiseWindow)) {
-            return
-        }
-    } else {
-        ; If the window is not found, check other desktops
-        desktopOfWindow := VD.getDesktopNumOfWindow(winCriteria)
-
-        if desktopOfWindow != -1 {
-            ; If the window is on another desktop, switch to that desktop
-            VD.goToDesktopNum(desktopOfWindow)
-
-            ; Wait for desktop change to complete
-            while (VD.getCurrentDesktopNum() != desktopOfWindow) {
-                Sleep(10)
-            }
-
-            ; Re-check if window exists after desktop switch
-            hwnd := WinExist(winCriteria)
-            if (hwnd) {
-                if (!activateWindow(hwnd, maximiseWindow)) {
-                    return
-                }
-            } else {
-                ; Window not found after desktop switch, launch it
-                launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
-                releaseModifierKeys()
-                return
-            }
-        } else {
-            ; If the window is not found, launch the application
-            launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
-            releaseModifierKeys()
-            return
-        }
     }
     
-    ; Final modifier key release
+    ; No matching windows found, launch the application
+    launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
     releaseModifierKeys()
 }
 
@@ -284,3 +375,4 @@ showToast(msg, duration := 1000, width := 150, height := 20) {
     toastGui.Show("NoActivate x" x " y" y)
     SetTimer(() => toastGui.Destroy(), duration)
 }
+
