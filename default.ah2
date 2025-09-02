@@ -185,9 +185,9 @@ cycleMatchingWindows(winCriteria, maximiseWindow := false) {
     
     cycleData := windowCycleState[cycleKey]
     
-    ; Reset cycle if it's been more than 3 seconds since last activation
+    ; Reset cycle if it's been more than 5 seconds since last activation
     ; or if the window list has changed
-    if (currentTime - cycleData.lastTime > 3000 || 
+    if (currentTime - cycleData.lastTime > 5000 || 
         cycleData.windows.Length != windows.Length) {
         cycleData.index := 0
         cycleData.windows := windows.Clone()
@@ -276,21 +276,8 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
 
 ; Function to release all modifier keys
 releaseModifierKeys() {
-    ; Release all modifier keys explicitly
-    Send("{Ctrl up}{Alt up}{Shift up}{LWin up}{RWin up}")
-    Sleep(50) ; Give time for keys to be released
-    
-    ; Double-check and force release if still pressed
-    if (GetKeyState("Ctrl", "P"))
-        Send("{Ctrl up}")
-    if (GetKeyState("Alt", "P"))
-        Send("{Alt up}")
-    if (GetKeyState("Shift", "P"))
-        Send("{Shift up}")
-    if (GetKeyState("LWin", "P"))
-        Send("{LWin up}")
-    if (GetKeyState("RWin", "P"))
-        Send("{RWin up}")
+    Sleep(1000) ; Give time in case the user still has keys pressed
+    ;Send("{Ctrl up}{Alt up}{Shift up}{LWin up}{RWin up}")
 }
 
 ; Function to activate a window and optionally maximize it
@@ -325,12 +312,8 @@ activateWindow(hwnd, maximiseWindow := false) {
             WinMaximize("ahk_id " . hwnd)
         }
         
-        ; Release modifier keys to prevent them from getting stuck
-        releaseModifierKeys()
-        
     } catch Error as e {
         showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
-        releaseModifierKeys() ; Release keys even on error
         return false
     }
     return true
@@ -338,9 +321,6 @@ activateWindow(hwnd, maximiseWindow := false) {
 
 ; Function to switch to a window or launch an application if not found
 switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := false) {
-    ; Release modifier keys at the start to ensure clean state
-    releaseModifierKeys()
-    
     winCriteria := winTitleSubstring " ahk_exe " exeName
 
     ; Try to cycle through matching windows first
