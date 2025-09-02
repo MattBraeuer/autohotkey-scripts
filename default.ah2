@@ -276,7 +276,21 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
 
 ; Function to release all modifier keys
 releaseModifierKeys() {
+    ; Release all modifier keys explicitly
     Send("{Ctrl up}{Alt up}{Shift up}{LWin up}{RWin up}")
+    Sleep(50) ; Give time for keys to be released
+    
+    ; Double-check and force release if still pressed
+    if (GetKeyState("Ctrl", "P"))
+        Send("{Ctrl up}")
+    if (GetKeyState("Alt", "P"))
+        Send("{Alt up}")
+    if (GetKeyState("Shift", "P"))
+        Send("{Shift up}")
+    if (GetKeyState("LWin", "P"))
+        Send("{LWin up}")
+    if (GetKeyState("RWin", "P"))
+        Send("{RWin up}")
 }
 
 ; Function to activate a window and optionally maximize it
