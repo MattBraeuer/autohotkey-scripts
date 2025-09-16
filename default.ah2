@@ -49,12 +49,83 @@ class Log {
     static ERROR := 4
     static FATAL := 5
     
-    ; Configuration
-    static CURRENT_LOG_LEVEL := Log.DEBUG
-    static FILE_PATH := A_ScriptDir "\autohotkey.log"
-    static TO_FILE := true
-    static MAX_FILE_SIZE := 5242880  ; 5MB in bytes
-    static BACKUP_COUNT := 3
+    ; Configuration with environment variable support
+    static CURRENT_LOG_LEVEL := Log._getLogLevelFromEnv()
+    static FILE_PATH := Log._getLogFilePathFromEnv()
+    static TO_FILE := Log._getLogToFileFromEnv()
+    static MAX_FILE_SIZE := Log._getMaxFileSizeFromEnv()
+    static BACKUP_COUNT := Log._getBackupCountFromEnv()
+    
+    ; Static initialization - log configuration values
+    static _initialized := Log._logConfiguration()
+    
+    ; Private methods to read configuration from environment variables
+    static _getLogLevelFromEnv() {
+        envLevel := EnvGet("AHK_LOG_LEVEL")
+        if (envLevel != "") {
+            switch StrUpper(envLevel) {
+                case "DEBUG": return Log.DEBUG
+                case "INFO": return Log.INFO
+                case "WARN": return Log.WARN
+                case "ERROR": return Log.ERROR
+                case "FATAL": return Log.FATAL
+                default: return Log.INFO  ; Default fallback
+            }
+        }
+        return Log.INFO  ; Default if no environment variable
+    }
+    
+    static _getLogFilePathFromEnv() {
+        envPath := EnvGet("AHK_LOG_FILE")
+        if (envPath != "") {
+            return envPath
+        }
+        return A_ScriptDir "\autohotkey.log"  ; Default
+    }
+    
+    static _getLogToFileFromEnv() {
+        envToFile := EnvGet("AHK_LOG_TO_FILE")
+        if (envToFile != "") {
+            return (StrUpper(envToFile) == "TRUE" || envToFile == "1")
+        }
+        return true  ; Default to true to ensure logging is enabled
+    }
+    
+    static _getMaxFileSizeFromEnv() {
+        envSize := EnvGet("AHK_LOG_MAX_SIZE")
+        if (envSize != "" && IsNumber(envSize)) {
+            return Integer(envSize)
+        }
+        return 5242880  ; Default 5MB
+    }
+    
+    static _getBackupCountFromEnv() {
+        envCount := EnvGet("AHK_LOG_BACKUP_COUNT")
+        if (envCount != "" && IsNumber(envCount)) {
+            return Integer(envCount)
+        }
+        return 3  ; Default
+    }
+    
+    ; Log configuration values after static initialization
+    static _logConfiguration() {
+        ; Use a simple file append for initialization logging since Log.message() isn't ready yet
+        if (Log.TO_FILE) {
+            try {
+                timestamp := FormatTime(A_Now, "yyyy-MM-dd HH:mm:ss.fff")
+                configMsg := timestamp . " [INFO] Log configuration initialized:"
+                configMsg .= " LEVEL=" . Log.toString(Log.CURRENT_LOG_LEVEL)
+                configMsg .= " TO_FILE=" . (Log.TO_FILE ? "true" : "false")
+                configMsg .= " FILE_PATH=" . Log.FILE_PATH
+                configMsg .= " MAX_SIZE=" . Log.MAX_FILE_SIZE
+                configMsg .= " BACKUP_COUNT=" . Log.BACKUP_COUNT
+                FileAppend(configMsg . "`n", Log.FILE_PATH, "UTF-8")
+            } catch Error {
+                ; Silently ignore file write errors during initialization
+            }
+        }
+        return true
+    }
     
     static toString(level) {
         switch level {
@@ -420,20 +491,29 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
         }
     }
 
-    Run(launchCommand)
+    try {
+        Run(launchCommand)
+    } catch Error as e {
+        showToast("Failed to launch: " . e.Message, 3000)
+        Log.message(Log.ERROR, "launchApplication() - Launch failed", false, Map("error", e.Message, "command", launchCommand))
+        return false
+    }
 
     if (maximiseWindow) {
-        ; Wait for the window to be active
-        hwnd := WinWaitActive(winCriteria, "", 10)
-
+        ; Wait for the window to be active with error handling
         try {
-            WinMaximize(hwnd)
+            hwnd := WinWaitActive(winCriteria, "", 10)
+            if (hwnd) {
+                WinMaximize(hwnd)
+            }
         } catch Error as e {
-            showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
+            showToast("Failed to maximize window: " . e.Message, 2000)
+            Log.message(Log.WARN, "launchApplication() - Maximize failed", false, Map("error", e.Message))
         }
     }
     
     Log.message(Log.DEBUG, "launchApplication() - Exit", false, Map("targetDesktop", targetDesktop, "appName", appName))
+    return true
 }
 
 ; Function to release all modifier keys
@@ -458,8 +538,12 @@ activateWindow(hwnd, maximiseWindow := false) {
     
     if (!maximiseWindow) {
         ; Minimize all windows first when NOT maximizing to show desktop background
-        Send("#m")
-        Sleep(100) ; Brief pause to ensure minimize completes
+        try {
+            Send("#m")
+            Sleep(100) ; Brief pause to ensure minimize completes
+        } catch Error as e {
+            Log.message(Log.WARN, "activateWindow() - Minimize all failed", false, Map("error", e.Message))
+        }
     }
 
     try {
@@ -467,13 +551,14 @@ activateWindow(hwnd, maximiseWindow := false) {
         WinActivate("ahk_id " . hwnd)
         
         ; Wait for activation with timeout
-        timeout := A_TickCount + 1000 ; 1 second timeout
+        timeout := A_TickCount + 2000 ; Increased to 2 seconds for slower systems
         while (!WinActive("ahk_id " . hwnd) && A_TickCount < timeout) {
-            Sleep(10)
+            Sleep(50) ; Increased sleep interval to reduce CPU usage
         }
         
         ; Check if activation was successful
         if (!WinActive("ahk_id " . hwnd)) {
+            Log.message(Log.WARN, "activateWindow() - Activation timeout", false, Map("hwnd", hwnd))
             return false
         }
 
@@ -482,8 +567,8 @@ activateWindow(hwnd, maximiseWindow := false) {
         }
         
     } catch Error as e {
-        showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
-        Log.message(Log.DEBUG, "activateWindow() - Exit", false, Map("result", false, "error", e.Message))
+        showToast("Failed to activate window: " . e.Message, 2000)
+        Log.message(Log.ERROR, "activateWindow() - Activation failed", false, Map("result", false, "error", e.Message))
         return false
     }
     
@@ -538,20 +623,25 @@ getDesktopName() {
 }
 
 ; Function to show a toast message
-showToast(msg, duration := 1000, width := 150, height := 20) {
+showToast(msg, duration := 1000, width := 300, height := 60) {
     Log.message(Log.DEBUG, "showToast() - Entry", false, Map("msg", msg, "duration", duration, "width", width, "height", height))
     
-    toastGui := Gui("+AlwaysOnTop -Caption +ToolWindow")
-    toastGui.BackColor := "333333"               ; dark grey
-    toastGui.SetFont("s12 cWhite", "Segoe UI")   ; white text
-    toastGui.AddText("w" width " h" height " Center", msg)
+    try {
+        toastGui := Gui("+AlwaysOnTop -Caption +ToolWindow")
+        toastGui.BackColor := "333333"               ; dark grey
+        toastGui.SetFont("s12 cWhite", "Segoe UI")   ; white text
+        toastGui.AddText("w" width " h" height " Center", msg)
 
-    ; center on screen
-    x := (A_ScreenWidth - 300) / 2
-    y := (A_ScreenHeight - 150)
+        ; center on screen
+        x := (A_ScreenWidth - width) / 2  ; Fixed calculation using actual width
+        y := (A_ScreenHeight - 150)
 
-    toastGui.Show("NoActivate x" x " y" y)
-    SetTimer(() => toastGui.Destroy(), duration)
+        toastGui.Show("NoActivate x" x " y" y)
+        SetTimer(() => toastGui.Destroy(), duration)
+    } catch Error as e {
+        ; Fallback for toast display errors - use built-in message
+        MsgBox("Toast Error: " . e.Message . "`nOriginal Message: " . msg, "AutoHotkey", "T3")
+    }
     
     Log.message(Log.DEBUG, "showToast() - Exit")
 }
