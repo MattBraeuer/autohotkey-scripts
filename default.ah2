@@ -33,6 +33,7 @@ APP_DESKTOP_MAP := Map(
     "msedge.exe|FAIR Consulting Group Mail", [3, "Gmail"],            ; Gmail -> Secondary Desktop
     "msedge.exe|Kagi Assistant", [2, "Kagi Assistant"],               ; Kagi Assistant -> Primary Desktop
     "msedge.exe|JIRA", [3, "JIRA"],                                   ; JIRA -> Secondary Desktop
+    "msedge.exe|Rocketlane", [3, "Rocketlane"],                       ; Rocketlane -> Secondary Desktop
     "slack.exe|Slack", [3, "Slack"],                                  ; Slack -> Secondary Desktop
     "Motion - Projects, Tasks, and Calendar.exe|Motion", [3, "Motion"], ; Motion -> Secondary Desktop
     "Mailbird.exe|Mailbird", [3, "Mailbird"],                         ; Mailbird -> Secondary Desktop
@@ -50,6 +51,9 @@ APP_DESKTOP_MAP := Map(
 ^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe", true)
 ^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe"
 )
+^!r:: switchToWindow("Rocketlane", "msedge.exe",
+    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=bgcfkelkdpfhdekllinhgjngdcbomhfh --app-url=https://faircg.rocketlane.com --app-title="Rocketlane" --app-launch-source=4',
+    true)
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
     MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=fmgjjmmmlfnkbppncabfkddbjimcfncm --app-url=https://mail.google.com/mail/?usp=installed_webapp --app-title="Gmail" --app-launch-source=4',
     true)
