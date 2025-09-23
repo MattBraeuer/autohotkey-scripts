@@ -274,12 +274,6 @@ launchApplication(launchCommand, winCriteria, maximiseWindow := false, exeName :
     }
 }
 
-; Function to release all modifier keys
-releaseModifierKeys() {
-    Sleep(1000) ; Give time in case the user still has keys pressed
-    ;Send("{Ctrl up}{Alt up}{Shift up}{LWin up}{RWin up}")
-}
-
 ; Function to activate a window and optionally maximize it
 activateWindow(hwnd, maximiseWindow := false) {
     ; Verify the window still exists before attempting to activate
@@ -325,13 +319,11 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
 
     ; Try to cycle through matching windows first
     if (cycleMatchingWindows(winCriteria, maximiseWindow)) {
-        releaseModifierKeys()
         return
     }
     
     ; No matching windows found, launch the application
     launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
-    releaseModifierKeys()
 }
 
 ; Function to get the name of the current virtual desktop
