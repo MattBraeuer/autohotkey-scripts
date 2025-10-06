@@ -69,7 +69,7 @@ APP_DESKTOP_MAP := Map(
 )
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
 ^!o:: switchToWindow("", "Obsidian.exe", LOCAL_PROGRAMS_PATH "Obsidian\Obsidian.exe", true)
-^!m:: switchToWindow("", "Miro.exe", WINDOWS_APPS_PATH "Miro.exe", true)
+^!m:: switchToWindow("", "Miro.exe", LOCAL_PROGRAMS_PATH "RealtimeBoard\Miro.exe", true)
 
 ; Window management hotkeys
 #!Down:: minimizeActiveWindow()
