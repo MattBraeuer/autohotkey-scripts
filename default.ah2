@@ -102,19 +102,19 @@ APP_DESKTOP_MAP := Map(
 ; Function to get all windows matching criteria
 getAllMatchingWindows(winCriteria) {
     windows := []
-    
+
     ; Save current settings
     bak_DetectHiddenWindows := A_DetectHiddenWindows
     bak_TitleMatchMode := A_TitleMatchMode
-    
+
     try {
         ; Enable detection of hidden windows (windows on other desktops)
         DetectHiddenWindows true
         SetTitleMatchMode "2"
-        
+
         ; Get all windows matching the criteria across all desktops
         windowList := WinGetList(winCriteria)
-        
+
         for hwnd in windowList {
             ; Verify the window still exists and is valid
             if (WinExist("ahk_id " . hwnd)) {
@@ -134,7 +134,7 @@ getAllMatchingWindows(winCriteria) {
         SetTitleMatchMode bak_TitleMatchMode
         DetectHiddenWindows bak_DetectHiddenWindows
     }
-    
+
     return windows
 }
 
@@ -142,7 +142,7 @@ getAllMatchingWindows(winCriteria) {
 switchToWindowDesktop(hwnd) {
     desktopOfWindow := VD.getDesktopNumOfWindow("ahk_id " . hwnd)
     currentDesktop := VD.getCurrentDesktopNum()
-    
+
     ; Switch to the target desktop if needed
     if (desktopOfWindow != -1 && desktopOfWindow != currentDesktop) {
         VD.goToDesktopNum(desktopOfWindow)
@@ -162,13 +162,13 @@ switchToWindowDesktop(hwnd) {
 cycleMatchingWindows(winCriteria, maximiseWindow := false) {
     ; Static variable to track window cycling state
     static windowCycleState := Map()
-    
+
     windows := getAllMatchingWindows(winCriteria)
-    
+
     if (windows.Length == 0) {
         return false ; No windows found
     }
-    
+
     ; Only one window - switch to its desktop first
     if (windows.Length == 1) {
         targetWindow := windows[1]
@@ -177,34 +177,35 @@ cycleMatchingWindows(winCriteria, maximiseWindow := false) {
         }
         return activateWindow(targetWindow, maximiseWindow)
     }
-    
+
     ; Multiple windows - cycle through them
     currentTime := A_TickCount
     cycleKey := winCriteria
-    
+
     ; Initialize or get cycle state for this criteria
     if (!windowCycleState.Has(cycleKey)) {
-        windowCycleState[cycleKey] := {index: 0, lastTime: 0, windows: []}
+        windowCycleState[cycleKey] := { index: 0, lastTime: 0, windows: [] }
     }
-    
+
     cycleData := windowCycleState[cycleKey]
-    
+
     ; Reset cycle if it's been more than 5 seconds since last activation
     ; or if the window list has changed
-    if (currentTime - cycleData.lastTime > 5000 || 
+    if (cycleData.lastTime = 0 ||
+        currentTime - cycleData.lastTime > 5000 ||
         cycleData.windows.Length != windows.Length) {
         cycleData.index := 0
         cycleData.windows := windows.Clone()
     } else {
         ; Move to next window in cycle
-        cycleData.index := Mod(cycleData.index + 1, windows.Length)
+        cycleData.index := Mod(cycleData.index + 1, cycleData.windows.Length)
     }
-    
+
     ; Update last activation time
     cycleData.lastTime := currentTime
-    
+
     ; Activate target window
-    targetWindow := windows[cycleData.index + 1] ; Arrays are 1-based
+    targetWindow := cycleData.windows[cycleData.index + 1] ; Arrays are 1-based
     if (!switchToWindowDesktop(targetWindow)) {
         return false ; Desktop switch failed
     }
@@ -284,17 +285,17 @@ activateWindow(hwnd, maximiseWindow := false) {
     if (!WinExist("ahk_id " . hwnd)) {
         return false
     }
-    
+
     try {
         ; Try to activate the window with a timeout
         WinActivate("ahk_id " . hwnd)
-        
+
         ; Wait for activation with timeout
         timeout := A_TickCount + 1000 ; 1 second timeout
         while (!WinActive("ahk_id " . hwnd) && A_TickCount < timeout) {
             Sleep(10)
         }
-        
+
         ; Check if activation was successful
         if (!WinActive("ahk_id " . hwnd)) {
             return false
@@ -303,7 +304,7 @@ activateWindow(hwnd, maximiseWindow := false) {
         if (maximiseWindow) {
             WinMaximize("ahk_id " . hwnd)
         }
-        
+
     } catch Error as e {
         showToast(e.Message, 2000, 300) ; Show error message for 2 seconds
         return false
@@ -319,7 +320,7 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
     if (cycleMatchingWindows(winCriteria, maximiseWindow)) {
         return
     }
-    
+
     ; No matching windows found, launch the application
     launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
 }
@@ -359,4 +360,3 @@ showToast(msg, duration := 1000, width := 150, height := 20) {
     toastGui.Show("NoActivate x" x " y" y)
     SetTimer(() => toastGui.Destroy(), duration)
 }
-
