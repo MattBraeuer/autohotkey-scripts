@@ -285,12 +285,6 @@ activateWindow(hwnd, maximiseWindow := false) {
         return false
     }
     
-    if (!maximiseWindow) {
-        ; Minimize all windows first when NOT maximizing to show desktop background
-        Send("#m")
-        Sleep(100) ; Brief pause to ensure minimize completes
-    }
-
     try {
         ; Try to activate the window with a timeout
         WinActivate("ahk_id " . hwnd)
