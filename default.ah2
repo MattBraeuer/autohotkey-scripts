@@ -52,7 +52,7 @@ APP_DESKTOP_MAP := Map(
 ^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe"
 )
 ^!r:: switchToWindow("Rocketlane", "msedge.exe",
-    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=bgcfkelkdpfhdekllinhgjngdcbomhfh --app-url=https://faircg.rocketlane.com --app-title="Rocketlane" --app-launch-source=4',
+    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=olhanhdjfagopdlkfbfikkjjddkaomni --app-url=https://psa.faircg.com --app-title="Rocketlane" --app-launch-source=4',
     true)
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
     MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=fmgjjmmmlfnkbppncabfkddbjimcfncm --app-url=https://mail.google.com/mail/?usp=installed_webapp --app-title="Gmail" --app-launch-source=4',
