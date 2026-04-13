@@ -15,6 +15,7 @@ SetControlDelay(-1)
 SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 
 ; ----- IMPORT OF OTHER SCRIPTS -----
+#Include config.ah2    ; Local configuration constants
 #Include %A_LineFile%\..\..\VD.ahk\VD.ah2    ; Virtual Desktop library
 
 ; ----- CONSTANT DEFINITIONS -----
@@ -327,23 +328,15 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
 
 ; Function to get the name of the current virtual desktop
 getDesktopName() {
-    ; Create a Map object (more reliable than object literals for key access)
-    static names := Map()
-    if !names.Count {  ; Initialize only once
-        names[1] := "Terminal"
-        names[2] := "Primary"
-        names[3] := "Secondary"
-        names[4] := "Video Conference"
-    }
+    global DESKTOP_NAMES
 
     ; Get current desktop number
     num := VD.getCurrentDesktopNum()
 
     ; Return the name if it exists, otherwise return generic name
-    if names.Has(num)
-        return names[num]
-    else
-        return "Desktop " num
+    if DESKTOP_NAMES.Has(num)
+        return DESKTOP_NAMES[num]
+    return "Desktop " num
 }
 
 ; Function to show a toast message
