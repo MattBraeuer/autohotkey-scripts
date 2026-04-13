@@ -65,6 +65,9 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^#numpad3:: VD.goToDesktopNum(4)  ;Video Conference Desktop
 ^>!numpad3:: VD.goToDesktopNum(4)  ;Video Conference Desktop (Right Alt)
 ^#3:: VD.goToDesktopNum(4)  ;Video Conference Desktop (standard number key)
+^#numpad4:: VD.goToDesktopNum(5)  ;Client Workspace Desktop
+^>!numpad4:: VD.goToDesktopNum(5)  ;Client Workspace Desktop (Right Alt)
+^#4:: VD.goToDesktopNum(5)  ;Client Workspace Desktop (standard number key)
 ^#NumpadDot:: showToast(getDesktopName()) ; Show current desktop name
 ^#.:: showToast(getDesktopName()) ; Show current desktop name (standard period key)
 
@@ -73,6 +76,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 #numpad1:: VD.MoveWindowToDesktopNum("A", 2) ; Move active window to Primary desktop
 #numpad2:: VD.MoveWindowToDesktopNum("A", 3) ; Move active window to Secondary desktop
 #numpad3:: VD.MoveWindowToDesktopNum("A", 4) ; Move active window to Video Conference desktop
+#numpad4:: VD.MoveWindowToDesktopNum("A", 5) ; Move active window to Client Workspace desktop
 
 ; ----- FUNCTION DEFINITIONS -----
 

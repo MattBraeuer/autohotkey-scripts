@@ -45,9 +45,15 @@ DESKTOP_NAMES := Map(
     1, "Terminal",
     2, "Primary",
     3, "Secondary",
-    4, "Video Conference"
+    4, "Video Conference",
+    5, "Client Workspace"
 )
 ```
+
+**Virtual Desktop Hotkeys** (in `default.ah2`):
+- Desktop switching follows the pattern `Ctrl+Win+Numpad0-4` and `Ctrl+Win+0-4` for desktops 1-5.
+- Razer-bound alternates follow the pattern `Ctrl+RightAlt+Numpad0-4` for desktops 1-5.
+- Window moves follow the pattern `Win+Numpad0-4`, with `Win+Numpad4` moving the active window to `Client Workspace`.
 
 **Application Desktop Mapping** (in `config.ah2`):
 The `APP_DESKTOP_MAP` associative array defines application-to-desktop assignments. The key is a compound string of executable name and window title, and the value is an array with desktop number and optional display name.

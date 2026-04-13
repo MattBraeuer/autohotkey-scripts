@@ -5,7 +5,8 @@ DESKTOP_NAMES := Map(
     1, "Terminal",
     2, "Primary",
     3, "Secondary",
-    4, "Video Conference"
+    4, "Video Conference",
+    5, "Client Workspace"
 )
 
 ; ----- PATH CONSTANTS -----
