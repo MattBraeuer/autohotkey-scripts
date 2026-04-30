@@ -52,21 +52,16 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 #!Down:: minimizeActiveWindow()
 #!Up:: maximizeActiveWindow()
 
-; Virtual Desktop hotkeys (the ones with Right-ALT are for binding to Razer Keyboard special keys)
+; Virtual Desktop hotkeys
 ^#numpad0:: VD.goToDesktopNum(1)  ;Terminal
-^>!numpad0:: VD.goToDesktopNum(1)  ;Terminal (Right Alt)
 ^#0:: VD.goToDesktopNum(1)  ;Terminal (standard number key)
 ^#numpad1:: VD.goToDesktopNum(2)  ;Primary Desktop
-^>!numpad1:: VD.goToDesktopNum(2)  ;Primary Desktop (Right Alt)
 ^#1:: VD.goToDesktopNum(2)  ;Primary Desktop (standard number key)
 ^#numpad2:: VD.goToDesktopNum(3)  ;Secondary Desktop
-^>!numpad2:: VD.goToDesktopNum(3)  ;Secondary Desktop (Right Alt)
 ^#2:: VD.goToDesktopNum(3)  ;Secondary Desktop (standard number key)
 ^#numpad3:: VD.goToDesktopNum(4)  ;Video Conference Desktop
-^>!numpad3:: VD.goToDesktopNum(4)  ;Video Conference Desktop (Right Alt)
 ^#3:: VD.goToDesktopNum(4)  ;Video Conference Desktop (standard number key)
 ^#numpad4:: VD.goToDesktopNum(5)  ;Client Workspace Desktop
-^>!numpad4:: VD.goToDesktopNum(5)  ;Client Workspace Desktop (Right Alt)
 ^#4:: VD.goToDesktopNum(5)  ;Client Workspace Desktop (standard number key)
 ^#NumpadDot:: showToast(getDesktopName()) ; Show current desktop name
 ^#.:: showToast(getDesktopName()) ; Show current desktop name (standard period key)
