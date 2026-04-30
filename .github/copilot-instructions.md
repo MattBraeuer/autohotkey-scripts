@@ -22,7 +22,7 @@ Key methods: `goToDesktopNum()`, `MoveWindowToDesktopNum()`, `getCurrentDesktopN
 
 `config.ah2` — loaded first via `#Include`, contains all user-editable configuration:
 1. **Desktop Name Mapping** (`DESKTOP_NAMES`): maps desktop numbers to display names
-2. **Path Constants**: `USER_PROFILE`, `MSEDGE_PROXY_PATH`, `WINDOWS_APPS_PATH`, `LOCAL_PROGRAMS_PATH`
+2. **Path Constants**: `USER_PROFILE`, `MSEDGE_PROXY_PATH`, `WINDOWS_APPS_PATH`, `LOCAL_PROGRAMS_PATH`, `WINDOWS_APP_LAUNCHER`
 3. **Application Desktop Mapping** (`APP_DESKTOP_MAP`): maps apps to target desktops
 
 `default.ah2` — main script, not manually edited for configuration:
@@ -62,6 +62,45 @@ APP_DESKTOP_MAP := Map(
     "Code.exe|Visual Studio Code", [2, "VS Code"],
     "msedge.exe|FAIR - Microsoft​ Edge", [2, "Microsoft Edge (Work)"]
 )
+```
+
+### Launch Command Patterns
+There are three types of launch commands depending on the app:
+
+| App type | Constant | Launch command pattern |
+|---|---|---|
+| Classic Win32 (installed to Program Files) | — | `'"C:\Program Files\App\App.exe"'` |
+| Win32 installed to LocalPrograms | `LOCAL_PROGRAMS_PATH` | `LOCAL_PROGRAMS_PATH "AppFolder\App.exe"` |
+| UWP/MSIX with a direct exe alias | `WINDOWS_APPS_PATH` | `WINDOWS_APPS_PATH "app.exe"` |
+| MSIX with no direct exe alias (version-stamped subfolder) | `WINDOWS_APP_LAUNCHER` | `WINDOWS_APP_LAUNCHER "PackageFamilyName!AppID"` |
+| Edge PWA | `MSEDGE_PROXY_PATH` | `MSEDGE_PROXY_PATH ' --profile-directory=... --app-id=...'` |
+
+For MSIX apps without a stable exe path (the subfolder changes with every update), **always** use `WINDOWS_APP_LAUNCHER`:
+```autohotkey
+WINDOWS_APP_LAUNCHER := "explorer.exe shell:AppsFolder\"
+; Usage:
+^!a:: switchToWindow("Claude", "Claude.exe", WINDOWS_APP_LAUNCHER "Claude_pzs8sxrjxfjjc!Claude", true)
+```
+The `PackageFamilyName!AppID` string can be found by running `Get-AppxPackage <AppName> | Select PackageFamilyName` in PowerShell.
+
+### Adding A New App Shortcut (Required Workflow)
+When adding a new app shortcut (for example, `Ctrl+Alt+A`), update **both** files in the same change:
+1. **`autohotkey-scripts/default.ah2`**
+- Add the hotkey in the hotkey section using this pattern:
+    `^!<key>:: switchToWindow("<Window Title>", "<ExeName>.exe", <launchCommand>, true)`
+- Use the same executable name and window-title substring that will be used in `APP_DESKTOP_MAP`.
+- Choose the correct launch command pattern from the table above.
+2. **`autohotkey-scripts/config.ah2`**
+- Add an `APP_DESKTOP_MAP` entry with the compound key format:
+    `"<ExeName>.exe|<Window Title>", [<desktopNum>, "<Display Name>"]`
+- Keep the title substring aligned with `switchToWindow(...)` so desktop routing works on launch.
+
+Shortcut change checklist (must all be true):
+- A new hotkey exists in `default.ah2`.
+- A matching `APP_DESKTOP_MAP` entry exists in `config.ah2`.
+- The `exeName` and title substring match across both files.
+- The correct launch command constant/pattern is used for the app type.
+- The script has no AutoHotkey syntax problems after the change.
 
 ## Development Workflows
 

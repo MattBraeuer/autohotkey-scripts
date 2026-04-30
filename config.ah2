@@ -14,6 +14,7 @@ USER_PROFILE := EnvGet("USERPROFILE")
 MSEDGE_PROXY_PATH := "C:\Program Files (x86)\Microsoft\Edge\Application\msedge_proxy.exe"
 WINDOWS_APPS_PATH := USER_PROFILE "\AppData\Local\Microsoft\WindowsApps\"
 LOCAL_PROGRAMS_PATH := USER_PROFILE "\AppData\Local\Programs\"
+WINDOWS_APP_LAUNCHER := "explorer.exe shell:AppsFolder\"
 
 ; Application to desktop mapping configuration.
 ; Key format: "exeName|windowTitle" (partial title match). Value: [desktopNum, displayName]
@@ -31,5 +32,6 @@ APP_DESKTOP_MAP := Map(
     "Motion - Projects, Tasks, and Calendar.exe|Motion", [3, "Motion"], ; Motion -> Secondary Desktop
     "Mailbird.exe|Mailbird", [3, "Mailbird"],                         ; Mailbird -> Secondary Desktop
     "Obsidian.exe|Obsidian", [3, "Obsidian"],                         ; Obsidian -> Secondary Desktop
+    "Claude.exe|Claude", [2, "Claude"],                               ; Claude -> Primary Desktop
     "Miro.exe|", [2, "Miro"]                                          ; Miro -> Primary Desktop
 )

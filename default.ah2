@@ -25,7 +25,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^!e:: switchToWindow("Personal", "msedge.exe", 'msedge.exe --profile-directory="Profile 1"', true)
 ^!v:: switchToWindow("Visual Studio Code", "Code.exe", LOCAL_PROGRAMS_PATH "Microsoft VS Code\Code.exe", true)
 ^!t:: switchToWindow("", "WindowsTerminal.exe", WINDOWS_APPS_PATH "wt.exe")
-^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe", true)
+^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe")
 ^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe"
 )
 ^!r:: switchToWindow("Rocketlane", "msedge.exe",
@@ -45,6 +45,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
     true
 )
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
+^!a:: switchToWindow("Claude", "Claude.exe", WINDOWS_APP_LAUNCHER "Claude_pzs8sxrjxfjjc!Claude", true)
 ^!o:: switchToWindow("Obsidian", "Obsidian.exe", LOCAL_PROGRAMS_PATH "Obsidian\Obsidian.exe", true)
 ^!m:: switchToWindow("Miro", "Miro.exe", LOCAL_PROGRAMS_PATH "RealtimeBoard\Miro.exe", true)
 
