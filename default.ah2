@@ -45,7 +45,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
     true
 )
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
-^!a:: switchToWindow("Claude", "Claude.exe", WINDOWS_APP_LAUNCHER "Claude_pzs8sxrjxfjjc!Claude", true)
+^!a:: switchToWindow("Claude", "Claude.exe", WINDOWS_APP_LAUNCHER "Claude_pzs8sxrjxfjjc!Claude", false)
 ^!o:: switchToWindow("Obsidian", "Obsidian.exe", LOCAL_PROGRAMS_PATH "Obsidian\Obsidian.exe", true)
 ^!m:: switchToWindow("Miro", "Miro.exe", LOCAL_PROGRAMS_PATH "RealtimeBoard\Miro.exe", true)
 
