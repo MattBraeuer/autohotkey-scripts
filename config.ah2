@@ -25,6 +25,7 @@ APP_DESKTOP_MAP := Map(
     "msedge.exe|FAIR - Microsoft​ Edge", [2, "Microsoft Edge (Work)"], ; Work Edge -> Primary Desktop
     "msedge.exe|Personal", [2, "Microsoft Edge (Personal)"],          ; Personal Edge -> Primary Desktop
     "msedge.exe|Google Calendar", [3, "Google Calendar"],             ; Google Calendar -> Secondary Desktop
+    "chrome.exe|Google Meet", [4, "Google Meet"],                     ; Google Meet -> Video Conference Desktop
     "msedge.exe|FAIR Consulting Group Mail", [3, "Gmail"],            ; Gmail -> Secondary Desktop
     "msedge.exe|Kagi Assistant", [2, "Kagi Assistant"],               ; Kagi Assistant -> Primary Desktop
     "msedge.exe|JIRA", [3, "JIRA"],                                   ; JIRA -> Secondary Desktop

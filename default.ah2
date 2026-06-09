@@ -37,6 +37,9 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^!c:: switchToWindow("Google Calendar", "chrome.exe",
     CHROME_PROXY_PATH ' --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4',
     true)
+^!m:: switchToWindow("Google Meet", "chrome.exe",
+    CHROME_PROXY_PATH ' --profile-directory="Default" --app-id=kjgfgldnnfoeklkmfkjfagphfepbbdan --app-url=https://meet.google.com/ --app-title="Google Meet" --app-launch-source=4',
+    true)
 ^!k:: switchToWindow("Kagi Assistant", "msedge.exe",
     MSEDGE_PROXY_PATH ' --profile-directory="Profile 1" --app-id=oafeghdgfnbkcilmbhphalhjimlhkcdc --app-url=https://kagi.com/assistant --app-title="Kagi Assistant"'
 )
@@ -47,7 +50,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
 ^!a:: switchToWindow("Claude", "Claude.exe", WINDOWS_APP_LAUNCHER "Claude_pzs8sxrjxfjjc!Claude", false)
 ^!o:: switchToWindow("Obsidian", "Obsidian.exe", LOCAL_PROGRAMS_PATH "Obsidian\Obsidian.exe", true)
-^!m:: switchToWindow("Miro", "Miro.exe", LOCAL_PROGRAMS_PATH "RealtimeBoard\Miro.exe", true)
+^!i:: switchToWindow("Miro", "Miro.exe", LOCAL_PROGRAMS_PATH "RealtimeBoard\Miro.exe", true)
 
 ; Window management hotkeys
 #!Down:: minimizeActiveWindow()
