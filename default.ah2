@@ -34,8 +34,8 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
     MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=fmgjjmmmlfnkbppncabfkddbjimcfncm --app-url=https://mail.google.com/mail/?usp=installed_webapp --app-title="Gmail" --app-launch-source=4',
     true)
-^!c:: switchToWindow("Google Calendar", "msedge.exe",
-    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4',
+^!c:: switchToWindow("Google Calendar", "chrome.exe",
+    CHROME_PROXY_PATH ' --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4',
     true)
 ^!k:: switchToWindow("Kagi Assistant", "msedge.exe",
     MSEDGE_PROXY_PATH ' --profile-directory="Profile 1" --app-id=oafeghdgfnbkcilmbhphalhjimlhkcdc --app-url=https://kagi.com/assistant --app-title="Kagi Assistant"'

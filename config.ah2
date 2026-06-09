@@ -12,6 +12,7 @@ DESKTOP_NAMES := Map(
 ; ----- PATH CONSTANTS -----
 USER_PROFILE := EnvGet("USERPROFILE")
 MSEDGE_PROXY_PATH := "C:\Program Files (x86)\Microsoft\Edge\Application\msedge_proxy.exe"
+CHROME_PROXY_PATH := "C:\Program Files\Google\Chrome\Application\chrome_proxy.exe"
 WINDOWS_APPS_PATH := USER_PROFILE "\AppData\Local\Microsoft\WindowsApps\"
 LOCAL_PROGRAMS_PATH := USER_PROFILE "\AppData\Local\Programs\"
 WINDOWS_APP_LAUNCHER := "explorer.exe shell:AppsFolder\"
