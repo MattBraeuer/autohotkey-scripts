@@ -28,7 +28,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe")
 ^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe"
 )
-^!r:: switchToWindow("Rocketlane", "msedge.exe",
+^!r:: switchToWindow("Rocketlane - Customer onboarding", "msedge.exe",
     MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=olhanhdjfagopdlkfbfikkjjddkaomni --app-url=https://psa.faircg.com --app-title="Rocketlane" --app-launch-source=4',
     true)
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
