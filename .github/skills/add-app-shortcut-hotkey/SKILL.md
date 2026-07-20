@@ -7,20 +7,24 @@ argument-hint: 'shortcut key, app window name, fullscreen yes/no, launcher type,
 # Add App Shortcut Hotkey
 
 Create or update a shortcut that follows this project pattern:
-- Hotkey format: Ctrl+Alt+<alphanumeric key>
+
+- Hotkey format: `Ctrl+Alt+<alphanumeric key>`
 - Action: switch to an existing app window, otherwise launch it
 - Required consistency: update both files in one change
 
 Files this skill updates:
+
 - `scripts/default.ah2`
 - `scripts/config.ah2`
 
 Never modify:
+
 - `scripts/VD.ahk/` (third-party dependency)
 
 ## When To Use
 
 Use this skill when you need a new app shortcut that:
+
 - Adds a `^!<key>:: switchToWindow(...)` binding
 - Chooses one of the supported launcher path patterns
 - Keeps desktop-routing behavior by adding `APP_DESKTOP_MAP` entry
@@ -29,11 +33,13 @@ Use this skill when you need a new app shortcut that:
 ## Inputs
 
 Primary parameters:
+
 - `shortcutKey`: single alphanumeric key used in `^!<key>`
 - `windowName`: title substring used for matching windows
 - `fullscreen`: `true` or `false` for the `maximiseWindow` argument
 
 Additional required decision inputs:
+
 - `launcherType`: one of
   - `WINDOWS_APPS_PATH`
   - `LOCAL_PROGRAMS_PATH`
@@ -43,6 +49,7 @@ Additional required decision inputs:
 - `desktopNumber`: target desktop number for `APP_DESKTOP_MAP`
 
 Conditional inputs:
+
 - `appId`: required for `MSEDGE_PROXY_PATH` and `CHROME_PROXY_PATH`
 - `profileDirectory`: optional for Edge/Chrome apps, default `Default`
 - `displayName`: optional friendly name for `APP_DESKTOP_MAP`
@@ -50,6 +57,7 @@ Conditional inputs:
 ## Default Exe Name Derivation
 
 Use this order to derive `exeName`:
+
 1. `MSEDGE_PROXY_PATH` -> `msedge.exe`
 2. `CHROME_PROXY_PATH` -> `chrome.exe`
 3. `WINDOWS_APPS_PATH` -> basename of exe path, preserving case if known
@@ -66,25 +74,26 @@ If confidence is low (especially Windows App Launcher), ask for override before 
 Construct `launchCommand` by `launcherType`:
 
 1. `WINDOWS_APPS_PATH`
-- Format: `WINDOWS_APPS_PATH "<exeAlias>.exe"`
+    - Format: `WINDOWS_APPS_PATH "<exeAlias>.exe"`
 
 2. `LOCAL_PROGRAMS_PATH`
-- Format: `LOCAL_PROGRAMS_PATH "<Folder>\<Exe>.exe"`
+    - Format: `LOCAL_PROGRAMS_PATH "<Folder>\<Exe>.exe"`
 
 3. `WINDOWS_APP_LAUNCHER`
-- Format: `WINDOWS_APP_LAUNCHER "<PackageFamilyName!AppID>"`
+    - Format: `WINDOWS_APP_LAUNCHER "<PackageFamilyName!AppID>"`
 
 4. `MSEDGE_PROXY_PATH`
-- Format:
-  `MSEDGE_PROXY_PATH ' --profile-directory="<profileDirectory>" --app-id=<appId> --app-url=<derivedUrl> --app-title="<windowName>" --app-launch-source=4'`
+    - Format:
+      `MSEDGE_PROXY_PATH ' --profile-directory="<profileDirectory>" --app-id=<appId> --app-url=<derivedUrl> --app-title="<windowName>" --app-launch-source=4'`
 
 5. `CHROME_PROXY_PATH`
-- Format:
-  `CHROME_PROXY_PATH ' --profile-directory="<profileDirectory>" --app-id=<appId> --app-url=<derivedUrl> --app-title="<windowName>" --app-launch-source=4'`
+    - Format:
+      `CHROME_PROXY_PATH ' --profile-directory="<profileDirectory>" --app-id=<appId> --app-url=<derivedUrl> --app-title="<windowName>" --app-launch-source=4'`
 
 ## URL Derivation For Edge/Chrome Apps
 
 Derive URL using a deterministic fallback sequence:
+
 1. If there is an existing hotkey with the same `appId`, reuse its `--app-url`.
 2. If there is an existing hotkey with the same `windowName`, reuse that URL.
 3. Infer from `windowName` keyword map:
@@ -97,35 +106,35 @@ Derive URL using a deterministic fallback sequence:
 ## Procedure
 
 1. Validate inputs
-- Ensure `shortcutKey` is a single alphanumeric char.
-- Ensure hotkey `^!<key>` is not already used in `default.ah2`.
-- Confirm `desktopNumber` is valid in `DESKTOP_NAMES` map.
+    - Ensure `shortcutKey` is a single alphanumeric char.
+    - Ensure hotkey `^!<key>` is not already used in `default.ah2`.
+    - Confirm `desktopNumber` is valid in `DESKTOP_NAMES` map.
 
 2. Derive normalized values
-- Compute `exeName` using derivation rules.
-- Set `titleSubstring = windowName`.
-- Set `maximiseWindow = fullscreen`.
-- Build `launchCommand` by launcher type.
+    - Compute `exeName` using derivation rules.
+    - Set `titleSubstring = windowName`.
+    - Set `maximiseWindow = fullscreen`.
+    - Build `launchCommand` by launcher type.
 
 3. Update `scripts/default.ah2`
-- Add:
-  `^!<key>:: switchToWindow("<windowName>", "<exeName>", <launchCommand>, <maximiseWindow>)`
-- Keep style consistent with surrounding multi-line formatting where needed.
+    - Add:
+      `^!<key>:: switchToWindow("<windowName>", "<exeName>", <launchCommand>, <maximiseWindow>)`
+    - Keep style consistent with surrounding multi-line formatting where needed.
 
 4. Update `scripts/config.ah2`
-- Add map entry:
-  `"<exeName>|<windowName>", [<desktopNumber>, "<displayName>"]`
-- If `displayName` omitted, default to `windowName`.
+    - Add map entry:
+      `"<exeName>|<windowName>", [<desktopNumber>, "<displayName>"]`
+    - If `displayName` omitted, default to `windowName`.
 
 5. Consistency checks
-- `exeName` in `switchToWindow` matches map key.
-- `windowName`/title substring matches map key.
-- Launcher constant matches chosen app type.
+    - `exeName` in `switchToWindow` matches map key.
+    - `windowName`/title substring matches map key.
+    - Launcher constant matches chosen app type.
 
 6. Validation
-- Confirm AutoHotkey syntax remains valid.
-- Confirm no edits outside `scripts/`.
-- Summarize final inserted lines in both files.
+    - Confirm AutoHotkey syntax remains valid.
+    - Confirm no edits outside `scripts/`.
+    - Summarize final inserted lines in both files.
 
 ## Decision Branches
 
@@ -141,35 +150,35 @@ Derive URL using a deterministic fallback sequence:
 ## Examples From This Repository
 
 1. Local Programs app (VS Code style)
-- Hotkey pattern in `default.ah2`:
-  `^!v:: switchToWindow("Visual Studio Code", "Code.exe", LOCAL_PROGRAMS_PATH "Microsoft VS Code\Code.exe", true)`
-- Matching map entry in `config.ah2`:
-  `"Code.exe|Visual Studio Code", [2, "VS Code"]`
+    - Hotkey pattern in `default.ah2`:
+      `^!v:: switchToWindow("Visual Studio Code", "Code.exe", LOCAL_PROGRAMS_PATH "Microsoft VS Code\Code.exe", true)`
+    - Matching map entry in `config.ah2`:
+      `"Code.exe|Visual Studio Code", [2, "VS Code"]`
 
 2. WindowsApps exe alias (Slack style)
-- Hotkey:
-  `^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe")`
-- Map:
-  `"slack.exe|Slack", [3, "Slack"]`
+    - Hotkey:
+      `^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe")`
+    - Map:
+      `"slack.exe|Slack", [3, "Slack"]`
 
 3. Windows App Launcher (Claude style)
-- Hotkey:
-  `^!a:: switchToWindow("Claude", "Claude.exe", WINDOWS_APP_LAUNCHER "Claude_pzs8sxrjxfjjc!Claude", false)`
-- Map:
-  `"Claude.exe|Claude", [2, "Claude"]`
+    - Hotkey:
+      `^!a:: switchToWindow("Claude", "Claude.exe", WINDOWS_APP_LAUNCHER "Claude_pzs8sxrjxfjjc!Claude", false)`
+    - Map:
+      `"Claude.exe|Claude", [2, "Claude"]`
 
 4. Edge app (Rocketlane style)
-- Hotkey:
-  `^!r:: switchToWindow("Rocketlane", "msedge.exe", MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=olhanhdjfagopdlkfbfikkjjddkaomni --app-url=https://psa.faircg.com --app-title="Rocketlane" --app-launch-source=4', true)`
-- Map:
-  `"msedge.exe|Rocketlane", [3, "Rocketlane"]`
+    - Hotkey:
+      `^!r:: switchToWindow("Rocketlane", "msedge.exe", MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=olhanhdjfagopdlkfbfikkjjddkaomni --app-url=https://psa.faircg.com --app-title="Rocketlane" --app-launch-source=4', true)`
+    - Map:
+      `"msedge.exe|Rocketlane", [3, "Rocketlane"]`
 
 5. Chrome app (Google Calendar style)
-- Hotkey:
-  `^!c:: switchToWindow("Google Calendar", "chrome.exe", CHROME_PROXY_PATH ' --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4', true)`
-- Map:
-  `"msedge.exe|Google Calendar", [3, "Google Calendar"]`
-- Note: current map appears inconsistent with `chrome.exe`; this skill should use matching exe names across both files.
+    - Hotkey:
+      `^!c:: switchToWindow("Google Calendar", "chrome.exe", CHROME_PROXY_PATH ' --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4', true)`
+    - Map:
+      `"msedge.exe|Google Calendar", [3, "Google Calendar"]`
+    - Note: current map appears inconsistent with `chrome.exe`; this skill should use matching exe names across both files.
 
 ## Completion Checklist
 
