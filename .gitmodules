@@ -1,0 +1,4 @@
+[submodule "scripts/VD.ahk"]
+	path = scripts/VD.ahk
+	url = https://github.com/FuPeiJiang/VD.ahk.git
+	branch = v2_port

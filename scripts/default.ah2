@@ -16,7 +16,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 
 ; ----- IMPORT OF OTHER SCRIPTS -----
 #Include config.ah2    ; Local configuration constants
-#Include %A_LineFile%\..\..\VD.ahk\VD.ah2    ; Virtual Desktop library
+#Include %A_LineFile%\..\VD.ahk\VD.ah2    ; Virtual Desktop library
 
 ; ----- HOTKEY DEFINITIONS -----
 
