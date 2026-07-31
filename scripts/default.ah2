@@ -21,10 +21,11 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ; ----- HOTKEY DEFINITIONS -----
 
 ; Switch to application windows or launch them if not found
-^!w:: switchToWindow("FAIR - Microsoft​ Edge", "msedge.exe", 'msedge.exe --profile-directory="Default"', true)
+^!+e:: switchToWindow("FAIR - Microsoft​ Edge", "msedge.exe", 'msedge.exe --profile-directory="Default"', true)
 ^!e:: switchToWindow("Personal", "msedge.exe", 'msedge.exe --profile-directory="Profile 1"', true)
 ^!v:: switchToWindow("Visual Studio Code", "Code.exe", LOCAL_PROGRAMS_PATH "Microsoft VS Code\Code.exe", true)
 ^!t:: switchToWindow("", "WindowsTerminal.exe", WINDOWS_APPS_PATH "wt.exe")
+^!w:: switchToWindow("", "warp.exe", LOCAL_PROGRAMS_PATH "Warp\warp.exe")
 ^!s:: switchToWindow("Slack", "slack.exe", WINDOWS_APPS_PATH "Slack.exe")
 ^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe"
 )
@@ -96,8 +97,15 @@ getAllMatchingWindows(winCriteria) {
         windowList := WinGetList(winCriteria)
 
         for hwnd in windowList {
-            ; Verify the window still exists and is valid
-            if (WinExist("ahk_id " . hwnd)) {
+            ; Verify the window still exists and is a genuine, activatable top-level window.
+            ; DetectHiddenWindows also surfaces non-visible helper windows owned by the
+            ; same exe (e.g. IME/GPU device windows), and some apps (e.g. Warp) keep a
+            ; visible but WS_EX_NOACTIVATE utility window around for event handling.
+            ; Both must be excluded here or cycling can land on one and either fail to
+            ; activate (triggering a spurious relaunch) or silently no-op the switch.
+            if (WinExist("ahk_id " . hwnd)
+                && (WinGetStyle("ahk_id " . hwnd) & 0x10000000)        ; WS_VISIBLE
+                && !(WinGetExStyle("ahk_id " . hwnd) & 0x08000000)) {  ; WS_EX_NOACTIVATE
                 windows.Push(hwnd)
             }
         }
