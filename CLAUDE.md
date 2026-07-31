@@ -47,7 +47,7 @@ For MSIX apps without a stable exe path, always use `WINDOWS_APP_LAUNCHER "Packa
 
 ## Adding a New App Shortcut
 
-A skill exists for this: `.github/skills/add-app-shortcut-hotkey/SKILL.md`. When adding a `Ctrl+Alt+<key>` app shortcut, both files must be updated **in the same change**:
+A skill exists for this: `.claude/skills/add-app-shortcut-hotkey/SKILL.md`. When adding a `Ctrl+Alt+<key>` app shortcut, both files must be updated **in the same change**:
 
 1. **`scripts/default.ah2`** — add `^!<key>:: switchToWindow("<Window Title>", "<ExeName>.exe", <launchCommand>, true)` in the hotkey section.
 2. **`scripts/config.ah2`** — add a matching `APP_DESKTOP_MAP` entry: `"<ExeName>.exe|<Window Title>", [<desktopNum>, "<Display Name>"]`.
