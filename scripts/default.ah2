@@ -30,22 +30,22 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^!n:: switchToWindow("Motion", "Motion - Projects, Tasks, and Calendar.exe", WINDOWS_APPS_PATH "motion---projects,-tasks,-and-calendar.exe"
 )
 ^!r:: switchToWindow("Rocketlane - Customer onboarding", "msedge.exe",
-    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=olhanhdjfagopdlkfbfikkjjddkaomni --app-url=https://psa.faircg.com --app-title="Rocketlane" --app-launch-source=4',
+    buildPwaLaunchCommand(MSEDGE_PROXY_PATH, "Rocketlane - Customer onboarding", "https://psa.faircg.com", "Rocketlane"),
     true)
 ^!g:: switchToWindow("FAIR Consulting Group Mail", "msedge.exe",
-    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=fmgjjmmmlfnkbppncabfkddbjimcfncm --app-url=https://mail.google.com/mail/?usp=installed_webapp --app-title="Gmail" --app-launch-source=4',
+    buildPwaLaunchCommand(MSEDGE_PROXY_PATH, "FAIR Consulting Group Mail", "https://mail.google.com/mail/?usp=installed_webapp", "Gmail"),
     true)
 ^!c:: switchToWindow("Google Calendar", "chrome.exe",
-    CHROME_PROXY_PATH ' --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4',
+    buildPwaLaunchCommand(CHROME_PROXY_PATH, "Google Calendar", "https://calendar.google.com/calendar/r", "Google Calendar"),
     true)
 ^!m:: switchToWindow("Google Meet", "chrome.exe",
-    CHROME_PROXY_PATH ' --profile-directory="Default" --app-id=kjgfgldnnfoeklkmfkjfagphfepbbdan --app-url=https://meet.google.com/ --app-title="Google Meet" --app-launch-source=4',
+    buildPwaLaunchCommand(CHROME_PROXY_PATH, "Google Meet", "https://meet.google.com/", "Google Meet"),
     true)
 ^!k:: switchToWindow("Kagi Assistant", "msedge.exe",
-    MSEDGE_PROXY_PATH ' --profile-directory="Profile 1" --app-id=oafeghdgfnbkcilmbhphalhjimlhkcdc --app-url=https://kagi.com/assistant --app-title="Kagi Assistant"'
+    buildPwaLaunchCommand(MSEDGE_PROXY_PATH, "Kagi Assistant", "https://kagi.com/assistant", "Kagi Assistant", false)
 )
 ^!j:: switchToWindow("JIRA", "msedge.exe",
-    MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=ejpflhkiicffhpomkffalllpffbaggio --app-url=https://faircg.atlassian.net/jira --app-title="JIRA"',
+    buildPwaLaunchCommand(MSEDGE_PROXY_PATH, "JIRA", "https://faircg.atlassian.net/jira", "JIRA"),
     true
 )
 ^!b:: switchToWindow("Mailbird", "Mailbird.exe", '"C:\Program Files\Mailbird\Mailbird.exe"', true)
@@ -311,6 +311,35 @@ switchToWindow(winTitleSubstring, exeName, launchCommand, maximiseWindow := fals
 
     ; No matching windows found, launch the application
     launchApplication(launchCommand, winCriteria, maximiseWindow, exeName, winTitleSubstring)
+}
+
+; Resolve {profile, appId} for a PWA hotkey. pwaKey must match the winTitleSubstring
+; used in that hotkey's switchToWindow() call. Checks this machine's entry in
+; PWA_MACHINE_OVERRIDES first, then falls back to DEFAULT_PWA_PARAMS. Throws if pwaKey
+; is in neither - a missing config entry must fail loudly, not launch with a blank or
+; wrong profile/app-id.
+resolvePwaParams(pwaKey) {
+    global PWA_MACHINE_OVERRIDES, DEFAULT_PWA_PARAMS
+
+    if (PWA_MACHINE_OVERRIDES.Has(A_ComputerName) && PWA_MACHINE_OVERRIDES[A_ComputerName].Has(pwaKey))
+        return PWA_MACHINE_OVERRIDES[A_ComputerName][pwaKey]
+
+    if (DEFAULT_PWA_PARAMS.Has(pwaKey))
+        return DEFAULT_PWA_PARAMS[pwaKey]
+
+    throw ValueError("No PWA params configured for '" pwaKey "' (host: " A_ComputerName "). Add an entry to DEFAULT_PWA_PARAMS and/or PWA_MACHINE_OVERRIDES['" A_ComputerName "'] in config.ah2.", -1)
+}
+
+; Build a msedge_proxy/chrome_proxy launch command for a PWA hotkey, resolving its
+; machine-specific profile/app-id via resolvePwaParams(). Centralizes the command
+; format so the 6 PWA hotkeys stay one-liners instead of each repeating the same
+; string-concatenation shape.
+buildPwaLaunchCommand(proxyPath, pwaKey, appUrl, appTitle, includeLaunchSource := true) {
+    params := resolvePwaParams(pwaKey)
+    cmd := proxyPath ' --profile-directory="' params.profile '" --app-id=' params.appId ' --app-url=' appUrl ' --app-title="' appTitle '"'
+    if includeLaunchSource
+        cmd .= ' --app-launch-source=4'
+    return cmd
 }
 
 ; Function to get the name of the current virtual desktop

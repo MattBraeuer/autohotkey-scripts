@@ -50,8 +50,8 @@ Additional required decision inputs:
 
 Conditional inputs:
 
-- `appId`: required for `MSEDGE_PROXY_PATH` and `CHROME_PROXY_PATH`
-- `profileDirectory`: optional for Edge/Chrome apps, default `Default`
+- `appId`: required for `MSEDGE_PROXY_PATH` and `CHROME_PROXY_PATH`. Feeds `DEFAULT_PWA_PARAMS` in `config.ah2`, not the hotkey line directly.
+- `profileDirectory`: optional for Edge/Chrome apps, default `Default`. Also feeds `DEFAULT_PWA_PARAMS`, not the hotkey line directly.
 - `displayName`: optional friendly name for `APP_DESKTOP_MAP`
 
 ## Default Exe Name Derivation
@@ -84,11 +84,13 @@ Construct `launchCommand` by `launcherType`:
 
 4. `MSEDGE_PROXY_PATH`
     - Format:
-      `MSEDGE_PROXY_PATH ' --profile-directory="<profileDirectory>" --app-id=<appId> --app-url=<derivedUrl> --app-title="<windowName>" --app-launch-source=4'`
+      `buildPwaLaunchCommand(MSEDGE_PROXY_PATH, "<windowName>", "<derivedUrl>", "<windowName>")`
 
 5. `CHROME_PROXY_PATH`
     - Format:
-      `CHROME_PROXY_PATH ' --profile-directory="<profileDirectory>" --app-id=<appId> --app-url=<derivedUrl> --app-title="<windowName>" --app-launch-source=4'`
+      `buildPwaLaunchCommand(CHROME_PROXY_PATH, "<windowName>", "<derivedUrl>", "<windowName>")`
+
+`profileDirectory` and `appId` are never embedded as literals in the hotkey line. They live in `config.ah2`'s `DEFAULT_PWA_PARAMS` map (see step below), and `buildPwaLaunchCommand()` (defined in `default.ah2`) resolves them per-machine at call time via `resolvePwaParams()`.
 
 ## URL Derivation For Edge/Chrome Apps
 
@@ -121,17 +123,22 @@ Derive URL using a deterministic fallback sequence:
       `^!<key>:: switchToWindow("<windowName>", "<exeName>", <launchCommand>, <maximiseWindow>)`
     - Keep style consistent with surrounding multi-line formatting where needed.
 
-4. Update `scripts/config.ah2`
+4. If `launcherType` is `MSEDGE_PROXY_PATH` or `CHROME_PROXY_PATH`, update `scripts/config.ah2`'s `DEFAULT_PWA_PARAMS`
+    - Add map entry:
+      `"<windowName>", { profile: "<profileDirectory>", appId: "<appId>" }`
+    - Required for any Edge/Chrome launcher type — do not skip even if the value is only known to be correct on one machine for now. If a given machine's actual profile/app-id ever differs, that's handled separately via a `PWA_MACHINE_OVERRIDES["<A_ComputerName>"]` entry, not by editing this default.
+
+5. Update `scripts/config.ah2`'s `APP_DESKTOP_MAP`
     - Add map entry:
       `"<exeName>|<windowName>", [<desktopNumber>, "<displayName>"]`
     - If `displayName` omitted, default to `windowName`.
 
-5. Consistency checks
+6. Consistency checks
     - `exeName` in `switchToWindow` matches map key.
-    - `windowName`/title substring matches map key.
+    - `windowName`/title substring matches map key, and matches the key used in `DEFAULT_PWA_PARAMS` (if applicable).
     - Launcher constant matches chosen app type.
 
-6. Validation
+7. Validation
     - Confirm AutoHotkey syntax remains valid.
     - Confirm no edits outside `scripts/`.
     - Summarize final inserted lines in both files.
@@ -142,6 +149,8 @@ Derive URL using a deterministic fallback sequence:
   - Offer replacement key options; do not overwrite silently.
 - If launcher type is Edge/Chrome and `appId` missing:
   - Block and request `appId`.
+- If `windowName` already exists as a key in `DEFAULT_PWA_PARAMS` with a different `appId`/`profileDirectory` than the one supplied:
+  - Confirm before overwriting; do not silently replace an existing (possibly machine-tuned) entry.
 - If launcher type is `WINDOWS_APP_LAUNCHER` and package id missing:
   - Block and request `PackageFamilyName!AppID`.
 - If URL cannot be derived confidently for Edge/Chrome:
@@ -169,14 +178,18 @@ Derive URL using a deterministic fallback sequence:
 
 4. Edge app (Rocketlane style)
     - Hotkey:
-      `^!r:: switchToWindow("Rocketlane", "msedge.exe", MSEDGE_PROXY_PATH ' --profile-directory="Default" --app-id=olhanhdjfagopdlkfbfikkjjddkaomni --app-url=https://psa.faircg.com --app-title="Rocketlane" --app-launch-source=4', true)`
-    - Map:
-      `"msedge.exe|Rocketlane", [3, "Rocketlane"]`
+      `^!r:: switchToWindow("Rocketlane - Customer onboarding", "msedge.exe", buildPwaLaunchCommand(MSEDGE_PROXY_PATH, "Rocketlane - Customer onboarding", "https://psa.faircg.com", "Rocketlane"), true)`
+    - `DEFAULT_PWA_PARAMS` entry:
+      `"Rocketlane - Customer onboarding", { profile: "Default", appId: "olhanhdjfagopdlkfbfikkjjddkaomni" }`
+    - `APP_DESKTOP_MAP` entry:
+      `"msedge.exe|Rocketlane - Customer onboarding", [3, "Rocketlane"]`
 
 5. Chrome app (Google Calendar style)
     - Hotkey:
-      `^!c:: switchToWindow("Google Calendar", "chrome.exe", CHROME_PROXY_PATH ' --profile-directory="Default" --app-id=kjbdgfilnfhdoflbpgamdcdgpehopbep --app-url=https://calendar.google.com/calendar/r --app-title="Google Calendar" --app-launch-source=4', true)`
-    - Map:
+      `^!c:: switchToWindow("Google Calendar", "chrome.exe", buildPwaLaunchCommand(CHROME_PROXY_PATH, "Google Calendar", "https://calendar.google.com/calendar/r", "Google Calendar"), true)`
+    - `DEFAULT_PWA_PARAMS` entry:
+      `"Google Calendar", { profile: "Default", appId: "kjbdgfilnfhdoflbpgamdcdgpehopbep" }`
+    - `APP_DESKTOP_MAP` entry:
       `"msedge.exe|Google Calendar", [3, "Google Calendar"]`
     - Note: current map appears inconsistent with `chrome.exe`; this skill should use matching exe names across both files.
 
@@ -184,6 +197,7 @@ Derive URL using a deterministic fallback sequence:
 
 - New hotkey exists in `default.ah2`.
 - Matching `APP_DESKTOP_MAP` entry exists in `config.ah2`.
+- For Edge/Chrome apps: matching `DEFAULT_PWA_PARAMS` entry exists in `config.ah2`, and the hotkey calls `buildPwaLaunchCommand(...)` rather than embedding `profile-directory`/`app-id` literals.
 - `exeName` and title substring align exactly across both files.
 - Correct launcher constant/pattern used.
 - Syntax and behavior validated.

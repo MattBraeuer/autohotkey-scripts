@@ -38,3 +38,26 @@ APP_DESKTOP_MAP := Map(
     "Claude.exe|Claude", [2, "Claude"],                               ; Claude -> Work Desktop
     "Miro.exe|", [2, "Miro"]                                          ; Miro -> Work Desktop
 )
+
+; Default/fallback PWA launch params, keyed by the winTitleSubstring used in that
+; hotkey's switchToWindow() call. These are the values that already work on the
+; original machine (hostname unknown/irrelevant - they're just the fallback).
+DEFAULT_PWA_PARAMS := Map(
+    "Rocketlane - Customer onboarding", { profile: "Default",   appId: "olhanhdjfagopdlkfbfikkjjddkaomni" },
+    "FAIR Consulting Group Mail",       { profile: "Default",   appId: "fmgjjmmmlfnkbppncabfkddbjimcfncm" },
+    "Google Calendar",                  { profile: "Default",   appId: "kjbdgfilnfhdoflbpgamdcdgpehopbep" },
+    "Google Meet",                      { profile: "Default",   appId: "kjgfgldnnfoeklkmfkjfagphfepbbdan" },
+    "Kagi Assistant",                   { profile: "Profile 1", appId: "oafeghdgfnbkcilmbhphalhjimlhkcdc" },
+    "JIRA",                             { profile: "Default",   appId: "ejpflhkiicffhpomkffalllpffbaggio" }
+)
+
+; Per-machine overrides, keyed by A_ComputerName. Add an entry whenever a PWA's actual
+; profile/app-id on that machine differs from DEFAULT_PWA_PARAMS (verified by inspecting
+; %LOCALAPPDATA%\<Browser>\User Data\<Profile>\Web Applications\_crx_<app-id> folders and
+; that profile's Preferences JSON). Always supply both fields even if only one differs.
+PWA_MACHINE_OVERRIDES := Map(
+    "NIOBE", Map(
+        "Kagi Assistant",  { profile: "Default", appId: "oafeghdgfnbkcilmbhphalhjimlhkcdc" }, ; same appId, default's profile was wrong
+        "Google Calendar", { profile: "Default", appId: "bfogiafebfohielmmehodmfbbebbbpei" }  ; profile OK, default's appId was wrong
+    )
+)
