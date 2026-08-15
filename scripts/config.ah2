@@ -25,7 +25,7 @@ APP_DESKTOP_MAP := Map(
     "warp.exe|", [2, "Warp"],                                          ; Warp -> Work Desktop
     "msedge.exe|FAIR - Microsoft​ Edge", [2, "Microsoft Edge (Work)"], ; Work Edge -> Work Desktop
     "msedge.exe|Personal", [2, "Microsoft Edge (Personal)"],          ; Personal Edge -> Work Desktop
-    "msedge.exe|Google Calendar", [3, "Google Calendar"],             ; Google Calendar -> Admin Desktop
+    "chrome.exe|Google Calendar", [3, "Google Calendar"],             ; Google Calendar -> Admin Desktop
     "chrome.exe|Google Meet", [4, "Google Meet"],                     ; Google Meet -> Social Desktop
     "msedge.exe|FAIR Consulting Group Mail", [3, "Gmail"],            ; Gmail -> Admin Desktop
     "msedge.exe|Kagi Assistant", [2, "Kagi Assistant"],               ; Kagi Assistant -> Work Desktop
@@ -41,7 +41,7 @@ APP_DESKTOP_MAP := Map(
 
 ; Default/fallback PWA launch params, keyed by the winTitleSubstring used in that
 ; hotkey's switchToWindow() call. These are the values that already work on the
-; original machine (hostname unknown/irrelevant - they're just the fallback).
+; original machine
 DEFAULT_PWA_PARAMS := Map(
     "Rocketlane - Customer onboarding", { profile: "Default",   appId: "olhanhdjfagopdlkfbfikkjjddkaomni" },
     "FAIR Consulting Group Mail",       { profile: "Default",   appId: "fmgjjmmmlfnkbppncabfkddbjimcfncm" },

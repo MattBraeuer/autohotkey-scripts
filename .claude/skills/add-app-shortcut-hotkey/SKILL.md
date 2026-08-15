@@ -190,8 +190,7 @@ Derive URL using a deterministic fallback sequence:
     - `DEFAULT_PWA_PARAMS` entry:
       `"Google Calendar", { profile: "Default", appId: "kjbdgfilnfhdoflbpgamdcdgpehopbep" }`
     - `APP_DESKTOP_MAP` entry:
-      `"msedge.exe|Google Calendar", [3, "Google Calendar"]`
-    - Note: current map appears inconsistent with `chrome.exe`; this skill should use matching exe names across both files.
+      `"chrome.exe|Google Calendar", [3, "Google Calendar"]`
 
 ## Completion Checklist
 
