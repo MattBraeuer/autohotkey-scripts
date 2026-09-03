@@ -52,6 +52,7 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ^!a:: switchToWindow("Claude", "Claude.exe", WINDOWS_APP_LAUNCHER "Claude_pzs8sxrjxfjjc!Claude", false)
 ^!o:: switchToWindow("Obsidian", "Obsidian.exe", LOCAL_PROGRAMS_PATH "Obsidian\Obsidian.exe", true)
 ^!i:: switchToWindow("Miro", "Miro.exe", LOCAL_PROGRAMS_PATH "RealtimeBoard\Miro.exe", true)
+^!h:: switchToWindow("Superhuman", "Superhuman.exe", LOCAL_PROGRAMS_PATH "Superhuman\Superhuman.exe", true)
 
 ; Window management hotkeys
 #!Down:: minimizeActiveWindow()

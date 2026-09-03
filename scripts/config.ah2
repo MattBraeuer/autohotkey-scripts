@@ -36,7 +36,8 @@ APP_DESKTOP_MAP := Map(
     "Mailbird.exe|Mailbird", [3, "Mailbird"],                         ; Mailbird -> Admin Desktop
     "Obsidian.exe|Obsidian", [3, "Obsidian"],                         ; Obsidian -> Admin Desktop
     "Claude.exe|Claude", [2, "Claude"],                               ; Claude -> Work Desktop
-    "Miro.exe|", [2, "Miro"]                                          ; Miro -> Work Desktop
+    "Miro.exe|", [2, "Miro"],                                         ; Miro -> Work Desktop
+    "Superhuman.exe|Superhuman", [3, "Superhuman"]                    ; Superhuman -> Admin Desktop
 )
 
 ; Default/fallback PWA launch params, keyed by the winTitleSubstring used in that
