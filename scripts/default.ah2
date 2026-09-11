@@ -21,8 +21,8 @@ SetTitleMatchMode(2) ; Set title match mode to allow partial matches
 ; ----- HOTKEY DEFINITIONS -----
 
 ; Switch to application windows or launch them if not found
-^!e:: switchToWindow("FAIR - Microsoft​ Edge", "msedge.exe", 'msedge.exe --profile-directory="Default"', true)
-^!+e:: switchToWindow("Personal", "msedge.exe", 'msedge.exe --profile-directory="Profile 1"', true)
+^!e:: switchToWindow("Personal", "msedge.exe", 'msedge.exe --profile-directory="Profile 1"', true)
+^!+e:: switchToWindow("Work", "msedge.exe", 'msedge.exe --profile-directory="Default"', true)
 ^!v:: switchToWindow("Visual Studio Code", "Code.exe", LOCAL_PROGRAMS_PATH "Microsoft VS Code\Code.exe", true)
 ^!t:: switchToWindow("", "WindowsTerminal.exe", WINDOWS_APPS_PATH "wt.exe")
 ^!w:: switchToWindow("", "warp.exe", LOCAL_PROGRAMS_PATH "Warp\warp.exe")

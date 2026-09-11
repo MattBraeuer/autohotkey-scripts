@@ -23,7 +23,7 @@ APP_DESKTOP_MAP := Map(
     "Code.exe|Visual Studio Code", [2, "VS Code"],                    ; VS Code -> Work Desktop
     "WindowsTerminal.exe|", [1, "Windows Terminal"],                   ; Windows Terminal -> Terminal Desktop
     "warp.exe|", [2, "Warp"],                                          ; Warp -> Work Desktop
-    "msedge.exe|FAIR - Microsoft​ Edge", [2, "Microsoft Edge (Work)"], ; Work Edge -> Work Desktop
+    "msedge.exe|Work", [2, "Microsoft Edge (Work)"],                  ; Work Edge -> Work Desktop
     "msedge.exe|Personal", [2, "Microsoft Edge (Personal)"],          ; Personal Edge -> Work Desktop
     "chrome.exe|Google Calendar", [3, "Google Calendar"],             ; Google Calendar -> Admin Desktop
     "chrome.exe|Google Meet", [4, "Google Meet"],                     ; Google Meet -> Social Desktop
